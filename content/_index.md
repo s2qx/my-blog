@@ -7,4 +7,4 @@ draft: false
 
  *Welcome to my Electrical Engineering blog!*
 
-This is a work in progress. Here I share my EE projects, tutorials, and experiments.
+Here I share my EE projects, tutorials, and experiments.
