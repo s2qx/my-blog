@@ -1,0 +1,65 @@
+baseURL = "https://blog.almubaireek.com/"
+languageCode = "en"
+title = "Saad ALMubaireek – EE Projects & Experiments"
+theme = "PaperMod"
+
+
+[pagination]
+  pagerSize = 5
+
+
+[params]
+  defaultTheme = "auto"
+  showSocial = true
+  showSocialEmpty = false
+  ShowReadingTime = true
+  
+  ShowShareButtons = true
+  ShareButtons = ["linkedin", "whatsapp", "email"] 
+  ShowPostNavLinks = true
+  ShowBreadCrumbs = true
+  ShowCodeCopyButtons = true
+  heroEnable = true
+  heroTitle = "Exploring Electrical Engineering, One Quirky Project at a Time"
+  heroSubTitle = "PCB renders, 3D enclosures, and microcontroller boards"
+  heroCTA = "View My Projects"
+  heroCTAURL = "/posts"
+  heroImage = "/images/hero-banner.jpg"
+  sidebarShow = true
+  sidebarWidgets = ["search","categories","social","downloads"]
+
+[menu]
+  [[menu.main]]
+    name = "Home"
+    url = "/"
+    weight = 1
+  [[menu.main]]
+    name = "Projects Lab"
+    url = "/categories/projects-lab/"
+    weight = 2
+  [[menu.main]]
+    name = "PCB & Hardware"
+    url = "/categories/pcb-hardware/"
+    weight = 3
+  [[menu.main]]
+    name = "Tutorials"
+    url = "/categories/tutorials/"
+    weight = 4
+  [[menu.main]]
+    name = "Academic Insights"
+    url = "/categories/academic-insights/"
+    weight = 5
+  [[menu.main]]
+    name = "About"
+    url = "/about/"
+    weight = 6
+  [[menu.main]]
+    name = "Contact"
+    url = "/contact/"
+    weight = 7
+
+ [params.social]
+  github = "https://github.com/s2qx"
+  linkedin = "https://www.linkedin.com/in/saad-khaild-almubaireek"
+  whatsapp = "https://wa.me/547252287"
+  email = "mailto:saad@almubaireek.com"
