@@ -34,8 +34,8 @@ theme = "PaperMod"
     url = "/"
     weight = 1
   [[menu.main]]
-    name = "Projects Lab"
-    url = "/categories/projects-lab/"
+    name = "Projects"
+    url = "/categories/projects/"
     weight = 2
   [[menu.main]]
     name = "PCB & Hardware"
