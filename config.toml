@@ -58,8 +58,9 @@ theme = "PaperMod"
     url = "/contact/"
     weight = 7
 
- [params.social]
-  github = "https://github.com/s2qx"
-  linkedin = "https://www.linkedin.com/in/saad-khaild-almubaireek"
-  whatsapp = "https://wa.me/547252287"
-  email = "mailto:saad@almubaireek.com"
+[params.social]
+github = "https://github.com/s2qx"
+linkedin = "https://www.linkedin.com/in/saad-khaild-almubaireek"
+whatsapp = "https://wa.me/547252287"
+email = "mailto:saad@almubaireek.com"
+
