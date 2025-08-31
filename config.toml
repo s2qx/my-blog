@@ -13,11 +13,15 @@ theme = "PaperMod"
   showSocial = true
   showSocialEmpty = false
   ShowReadingTime = true
+  ShowBreadCrumbs = true
+
   
   ShowShareButtons = true
   ShareButtons = ["linkedin", "whatsapp", "email"] 
   ShowPostNavLinks = true
-  ShowBreadCrumbs = true
+  
+  
+
   ShowCodeCopyButtons = true
   heroEnable = true
   heroTitle = "Exploring Electrical Engineering, One Quirky Project at a Time"
@@ -35,19 +39,19 @@ theme = "PaperMod"
     weight = 1
   [[menu.main]]
     name = "Projects"
-    url = "/categories/projects/"
+    url = "/projects/"
     weight = 2
   [[menu.main]]
     name = "PCB & Hardware"
-    url = "/categories/pcb-hardware/"
+    url = "/pcb-hardware/"
     weight = 3
   [[menu.main]]
     name = "Tutorials"
-    url = "/categories/tutorials/"
+    url = "/tutorials/"
     weight = 4
   [[menu.main]]
     name = "Academic Insights"
-    url = "/categories/academic-insights/"
+    url = "/academic-insights/"
     weight = 5
   [[menu.main]]
     name = "About"
