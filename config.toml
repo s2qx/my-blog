@@ -50,8 +50,8 @@ theme = "PaperMod"
     url = "/tutorials/"
     weight = 4
   [[menu.main]]
-    name = "Academic Insights"
-    url = "/academic-insights/"
+    name = "3d design"
+    url = "/3d design/"
     weight = 5
   [[menu.main]]
     name = "About"
