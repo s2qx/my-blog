@@ -2,8 +2,11 @@
 title: "FlatCam"
 description: "Guide for using FlatCam Software."
 draft: false
-
+build:
+  list: never
 ---
+
+
 
 📌 In this section, I explain **FlatCam software** to convert circuit designs into G-code for use with the **3018 CNC**.  
 

@@ -1,70 +1,118 @@
 baseURL = "https://blog.almubaireek.com/"
-languageCode = "en"
 title = "Saad ALMubaireek – EE Projects & Experiments"
 theme = "PaperMod"
 
+# 🌐 Multilingual
+defaultContentLanguage = "en"
+defaultContentLanguageInSubdir = true
+
+[languages]
+
+  [languages.en]
+    languageName = "English"
+    weight = 1
+    contentDir = "content/en"
+
+    [languages.en.params]
+      heroTitle = "Exploring Electrical Engineering, One Quirky Project at a Time"
+      heroSubTitle = "PCB design, 3D enclosures, and microcontroller boards"
+
+    [languages.en.menu]
+      [[languages.en.menu.main]]
+        name = "Home"
+        url = "/"
+        weight = 1
+      [[languages.en.menu.main]]
+        name = "Projects"
+        url = "/projects/"
+        weight = 2
+      [[languages.en.menu.main]]
+        name = "PCB & Hardware"
+        url = "/pcb-hardware/"
+        weight = 3
+      [[languages.en.menu.main]]
+        name = "Tutorials"
+        url = "/tutorials/"
+        weight = 4
+      [[languages.en.menu.main]]
+        name = "3D Design"
+        url = "/3d-design/"
+        weight = 5
+      [[languages.en.menu.main]]
+        name = "About"
+        url = "/about/"
+        weight = 6
+      [[languages.en.menu.main]]
+        name = "Contact"
+        url = "/contact/"
+        weight = 7
+
+  [languages.ar]
+    languageName = "العربية"
+    weight = 2
+    contentDir = "content/ar"
+    languageDirection = "rtl"
+
+    [languages.ar.params]
+      heroTitle = "استكشاف الهندسة الكهربائية مشروعًا بعد آخر"
+      heroSubTitle = "تصميم الدوائر المطبوعة، حاويات ثلاثية الأبعاد، ولوحات المتحكمات الدقيقة"
+
+    [languages.ar.menu]
+      [[languages.ar.menu.main]]
+        name = "الرئيسية"
+        url = "/"
+        weight = 1
+      [[languages.ar.menu.main]]
+        name = "المشاريع"
+        url = "/projects/"
+        weight = 2
+      [[languages.ar.menu.main]]
+        name = "PCB & Hardware"
+        url = "/pcb-hardware/"
+        weight = 3
+      [[languages.ar.menu.main]]
+        name = "شروحات"
+        url = "/tutorials/"
+        weight = 4
+      [[languages.ar.menu.main]]
+        name = "تصاميم ثلاثية الأبعاد"
+        url = "/3d-design/"
+        weight = 5
+      [[languages.ar.menu.main]]
+        name = "نبذة"
+        url = "/about/"
+        weight = 6
+      [[languages.ar.menu.main]]
+        name = "تواصل"
+        url = "/contact/"
+        weight = 7
 
 [pagination]
   pagerSize = 5
-
 
 [params]
   defaultTheme = "auto"
   showSocial = true
   showSocialEmpty = false
-  ShowReadingTime = true
+  ShowReadingTime = false
   ShowBreadCrumbs = true
-
-  
   ShowShareButtons = true
-  ShareButtons = ["linkedin", "whatsapp", "email"] 
+  ShareButtons = ["linkedin", "whatsapp", "email"]
   ShowPostNavLinks = true
-  
-  
-
   ShowCodeCopyButtons = true
   heroEnable = true
-  heroTitle = "Exploring Electrical Engineering, One Quirky Project at a Time"
-  heroSubTitle = "PCB renders, 3D enclosures, and microcontroller boards"
-  heroCTA = "View My Projects"
-  heroCTAURL = "/posts"
   heroImage = "/images/hero-banner.jpg"
   sidebarShow = true
   sidebarWidgets = ["search","categories","social","downloads"]
-
-[menu]
-  [[menu.main]]
-    name = "Home"
-    url = "/"
-    weight = 1
-  [[menu.main]]
-    name = "Projects"
-    url = "/projects/"
-    weight = 2
-  [[menu.main]]
-    name = "PCB & Hardware"
-    url = "/pcb-hardware/"
-    weight = 3
-  [[menu.main]]
-    name = "Tutorials"
-    url = "/tutorials/"
-    weight = 4
-  [[menu.main]]
-    name = "3d design"
-    url = "/3d design/"
-    weight = 5
-  [[menu.main]]
-    name = "About"
-    url = "/about/"
-    weight = 6
-  [[menu.main]]
-    name = "Contact"
-    url = "/contact/"
-    weight = 7
+  ShowLangSwitch = true   # 🌐 language toggle in navbar
 
 [params.social]
-github = "https://github.com/s2qx"
-linkedin = "https://www.linkedin.com/in/saad-khaild-almubaireek"
-whatsapp = "https://wa.me/547252287"
-email = "mailto:saad@almubaireek.com"
+  github = "https://github.com/s2qx"
+  linkedin = "https://www.linkedin.com/in/saad-khaild-almubaireek"
+  whatsapp = "https://wa.me/547252287"
+  email = "mailto:saad@almubaireek.com"
 
+[markup]
+  [markup.goldmark]
+    [markup.goldmark.renderer]
+      unsafe = true

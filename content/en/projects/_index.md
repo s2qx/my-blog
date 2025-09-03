@@ -3,6 +3,15 @@ title: "Projects"
 draft: false
 description: "Experiments, fails, and successes sometimes useful, sometimes hilarious."
 ---
+---
+### Contents
+1. [Electronics I Project](#1-electronics-i-project)
+2. [Electronics II Project](#2-electronics-ii-project)
+3. [Electromagnetic Project](#3-electromagnetic-project)
+4. [Probability Project](#4-probability-project)
+5. [Communication System Fundamentals Project](#5-communication-system-fundamentals-project)
+6. [Optical Communication Project](#6-optical-communication-project)
+7. [Power System Project](#7-power-system-project)
 
 
 ---

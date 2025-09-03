@@ -1,0 +1,35 @@
+/* ===== Site Colors (10 kΩ inspired, tweak anytime) ===== */
+:root{
+  --theme:#faf6f1;
+  --entry:#ffffff;
+  --primary:#3e2723;
+  --secondary:#212121;
+  --tertiary:#ef6c00;
+  --content:#2c2c2c;
+  --border:#d7ccc8;
+}
+
+/* Dark */
+.dark{
+  --theme:#121212;
+  --entry:#1e1e1e;
+  --primary:#ffcc80;
+  --secondary:#b0bec5;
+  --tertiary:#ff9800;
+  --content:#e0e0e0;
+  --border:#4e342e;
+}
+
+/* Ensure background applies */
+body{ background:var(--theme)!important; }
+
+/* ===== Arabic RTL polish ===== */
+html[lang="ar"] body{
+  direction: rtl;
+  text-align: right;
+}
+html[lang="ar"] .post-content,
+html[lang="ar"] .entry-content{
+  direction: rtl;
+  text-align: right;
+}
