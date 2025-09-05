@@ -47,45 +47,49 @@ defaultContentLanguageInSubdir = true
         url = "/contact/"
         weight = 7
 
-  [languages.ar]
-    languageName = "العربية"
-    weight = 2
-    contentDir = "content/ar"
-    languageDirection = "rtl"
-
-    [languages.ar.params]
-      heroTitle = "استكشاف الهندسة الكهربائية مشروعًا بعد آخر"
-      heroSubTitle = "تصميم الدوائر المطبوعة، حاويات ثلاثية الأبعاد، ولوحات المتحكمات الدقيقة"
-
-    [languages.ar.menu]
-      [[languages.ar.menu.main]]
-        name = "الرئيسية"
-        url = "/"
-        weight = 1
-      [[languages.ar.menu.main]]
-        name = "المشاريع"
-        url = "/projects/"
-        weight = 2
-      [[languages.ar.menu.main]]
-        name = "PCB & Hardware"
-        url = "/pcb-hardware/"
-        weight = 3
-      [[languages.ar.menu.main]]
-        name = "شروحات"
-        url = "/tutorials/"
-        weight = 4
-      [[languages.ar.menu.main]]
-        name = "تصاميم ثلاثية الأبعاد"
-        url = "/3d-design/"
-        weight = 5
-      [[languages.ar.menu.main]]
-        name = "نبذة"
-        url = "/about/"
-        weight = 6
-      [[languages.ar.menu.main]]
-        name = "تواصل"
-        url = "/contact/"
-        weight = 7
+  # -------------------------------
+  # Arabic version (disabled)
+  # Uncomment this block to re-enable
+  # -------------------------------
+  # [languages.ar]
+  #   languageName = "العربية"
+  #   weight = 2
+  #   contentDir = "content/ar"
+  #   languageDirection = "rtl"
+  #
+  #   [languages.ar.params]
+  #     heroTitle = "استكشاف الهندسة الكهربائية مشروعًا بعد آخر"
+  #     heroSubTitle = "تصميم الدوائر المطبوعة، حاويات ثلاثية الأبعاد، ولوحات المتحكمات الدقيقة"
+  #
+  #   [languages.ar.menu]
+  #     [[languages.ar.menu.main]]
+  #       name = "الرئيسية"
+  #       url = "/"
+  #       weight = 1
+  #     [[languages.ar.menu.main]]
+  #       name = "المشاريع"
+  #       url = "/projects/"
+  #       weight = 2
+  #     [[languages.ar.menu.main]]
+  #       name = "PCB & Hardware"
+  #       url = "/pcb-hardware/"
+  #       weight = 3
+  #     [[languages.ar.menu.main]]
+  #       name = "شروحات"
+  #       url = "/tutorials/"
+  #       weight = 4
+  #     [[languages.ar.menu.main]]
+  #       name = "تصاميم ثلاثية الأبعاد"
+  #       url = "/3d-design/"
+  #       weight = 5
+  #     [[languages.ar.menu.main]]
+  #       name = "نبذة"
+  #       url = "/about/"
+  #       weight = 6
+  #     [[languages.ar.menu.main]]
+  #       name = "تواصل"
+  #       url = "/contact/"
+  #       weight = 7
 
 [pagination]
   pagerSize = 5
@@ -104,7 +108,7 @@ defaultContentLanguageInSubdir = true
   heroImage = "/images/hero-banner.jpg"
   sidebarShow = true
   sidebarWidgets = ["search","categories","social","downloads"]
-  ShowLangSwitch = true   # 🌐 language toggle in navbar
+  ShowLangSwitch = false   # hide language switcher for now
 
 [params.social]
   github = "https://github.com/s2qx"

@@ -19,13 +19,13 @@ description: "بعض النماذج اللي صممتها وطبعتها"
 ---
 
 ### مقبض DEEJ
-مقبض لمشروع تحكم في الصوت (متغير مقاومة).
+مقبض لمشروع تحكم في الصوت.
 ![DEEJ Variable Resistor Knob](/images/DEEJ.png)
 [شوف التصميم](https://www.thingiverse.com/thing:6778589)
 
 ---
 
-### كوستر جسر كامل
+### Full Bridge Rectifier coaster
 كوستر يناسب كوب 90mm.
 ![Full Bridge Rectifier coaster](/images/full_bridge.png)
 [شوف التصميم](https://www.thingiverse.com/thing:6834536)
