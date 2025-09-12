@@ -3,6 +3,15 @@ title: "Smart Water Dispenser"
 draft: false
 description: "A personal project: a smart water dispenser with sensing, control, and clean design."
 ---
+---
+### Contents
+- [Weight Scale (Auto Water Dispenser)](#weight-scale-auto-water-dispenser)
+- [FM Transmitter](#fm-transmitter)
+- [MOSFET Switch](#mosfet-switch)
+- [Arduino Nano Servo/Robot Arm Driver](#arduino-nano-servorobot-arm-driver)
+- [ESP32 12V Control Board](#esp32-12v-control-board)
+- [Another Random Project](#another-random-project)
+---
 
 ### Smart Water Dispenser (Auto Water Dispenser)
 
@@ -76,7 +85,6 @@ I used this board to control my old RGB LED strip after I lost its original cont
 ![ESP32 12V Control Board 5](/images/ESP32_12V_Control_5.png)
 ![ESP32 12V Control Board 6](/images/ESP32_12V_Control_6.png)
 ![ESP32 12V Control Board 7](/images/ESP32_12V_Control_7.png)
-
 
 ---
 
