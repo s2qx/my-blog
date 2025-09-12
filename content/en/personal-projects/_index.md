@@ -77,6 +77,7 @@ I used this board to control my old RGB LED strip after I lost its original cont
 ![ESP32 12V Control Board 6](/images/ESP32_12V_Control_6.png)
 ![ESP32 12V Control Board 7](/images/ESP32_12V_Control_7.png)
 
+
 ---
 
 ### Another Random Project
