@@ -27,8 +27,8 @@ defaultContentLanguageInSubdir = true
         url = "/projects/"
         weight = 2
       [[languages.en.menu.main]]
-        name = "PCB & Hardware"
-        url = "/pcb-hardware/"
+        name = "Personal projects"
+        url = "/personal-projects/"
         weight = 3
       [[languages.en.menu.main]]
         name = "Tutorials"
