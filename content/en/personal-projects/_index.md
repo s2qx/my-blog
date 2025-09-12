@@ -70,8 +70,7 @@ I used this driver to control a robotic arm using a variable resistor. It made i
 
 ![Arduino Nano Servo/Robot Arm Driver](/images/ARM_ROBOT.png)
 ![Arduino Nano Servo/Robot Arm Driver 2](/images/ARM_ROBOT_2.png)
-![Arduino Nano Servo/Robot Arm Driver 3](/images/ARM_ROBOT_3.png)
-![Arduino Nano Servo/Robot Arm Driver 4](/images/ARM_ROBOT_4.png)
+
 
 ---
 
@@ -80,11 +79,7 @@ I used this board to control my old RGB LED strip after I lost its original cont
 
 ![ESP32 12V Control Board](/images/ESP32_12V_Control.png)
 ![ESP32 12V Control Board 2](/images/ESP32_12V_Control_2.png)
-![ESP32 12V Control Board 3](/images/ESP32_12V_Control_3.png)
-![ESP32 12V Control Board 4](/images/ESP32_12V_Control_4.png)
-![ESP32 12V Control Board 5](/images/ESP32_12V_Control_5.png)
-![ESP32 12V Control Board 6](/images/ESP32_12V_Control_6.png)
-![ESP32 12V Control Board 7](/images/ESP32_12V_Control_7.png)
+
 
 ---
 
