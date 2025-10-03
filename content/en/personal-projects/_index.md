@@ -1,7 +1,7 @@
 ---
-title: "Smart Water Dispenser"
+title: "Personal projects"
 draft: false
-description: "A personal project: a smart water dispenser with sensing, control, and clean design."
+description: "A collection of personal projects in electronics and DIY tinkering - experiments that succeed, fail, and always teach me something"
 ---
 ---
 ### Contents
