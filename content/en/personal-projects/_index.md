@@ -39,7 +39,10 @@ This project reflects my interest in applying control theory and embedded system
 It also gave me valuable hands-on experience with hardware integration, interface design, and system tuning.  
 
 ---
+## Code
+[You can check the code here.](https://drive.google.com/drive/folders/1Qvr082YVoMVMKMf4FI2jhf4FhZP1509x?usp=sharing)
 
+---
 ## Video and PCB Schematic
 {{< youtube vTC4E2wSImg >}}
 
