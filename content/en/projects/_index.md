@@ -12,6 +12,10 @@ description: "Experiments, fails, and successes sometimes useful, sometimes hila
 5. [Communication System Fundamentals Project](#5-communication-system-fundamentals-project)
 6. [Optical Communication Project](#6-optical-communication-project)
 7. [Power System Project](#7-power-system-project)
+8. [Analogue Control Systems Project](#8-analogue-control-systems-project)
+9. [Mechatronics Project](#9-mechatronics-project)
+
+
 
 
 ---
@@ -69,3 +73,36 @@ The project covers high-speed optical communication systems capable of transmitt
 This project studies household energy consumption and designs a tailored solar photovoltaic (PV) system with appropriate battery storage. Goals include precise load analysis, selecting inverters and charge controllers, designing system topology, and evaluating financial and technical feasibility. The final output is a comprehensive report detailing calculations, diagrams, and analysis for efficient and reliable energy management.  
 
 [You can check the report here.](https://drive.google.com/file/d/1rIffO_lX_43b14tkaCTfeqQSLZi3U68x/view?usp=drive_link)
+
+---
+
+### 8️⃣  Analogue Control Systems Project
+**Stability**  
+This project investigates the stability of a given linear, time-invariant (LTI) control system using a comprehensive set of classical control theory techniques.
+
+[You can check the report here.](https://drive.google.com/file/d/1FJNsZ4nzlDwsPlzsTTWzu-TZ1KHe2gVX/view?usp=drive_link)
+
+---
+
+### 9️⃣  Mechatronics Project
+**Pet Feeder System Using PIC16F877A**  
+This project presents the design of a smart pet feeder that automatically feeds pets based on preset feeding times. 
+The system uses a PIC16F877A microcontroller and a DS3231 real-time clock (RTC) to manage the feeding schedule. 
+The system controls a stepper motor via an A4988 driver to move a hopper that dispenses food at the set times. 
+An infrared (IR) sensor checks the food level in the food container, and if the food container is empty, the system displays a warning on the LCD and activates a buzzer. 
+The system has a user-friendly interface with buttons to set feeding times and control the motor manually. It also uses EEPROM to store settings, ensuring the data is saved even if the power goes out. 
+This project combines automation, sensing, and user control in a practical and easy-to-use pet care solution.
+
+[You can check the report here.](https://drive.google.com/file/d/1RgXLjpY019aqWoaDEiUxUqpMKlKCdmwf/view?usp=drive_link)
+
+[You can check the Code & Circuit digram here.](https://drive.google.com/drive/folders/1SRXPyVhu5yw6GIjPmOi_PoV-PVAS35I7?usp=drive_link)
+
+---
+<p align="center">
+  <img src="/images/Pet_Feeder_System.jpg" alt="Pet Feeder System" style="max-width:100%; height:auto;">
+</p>
+
+![Pet Feeder System circuit](/images/Pet_Feeder_System_circuit.jpg)
+---
+## Video dimensions
+{{< youtube JIq59XCSC5s >}}

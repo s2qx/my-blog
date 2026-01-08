@@ -14,6 +14,7 @@ You can find my new 3D design on [Thingiverse](https://www.thingiverse.com/erik2
 - [CNC 3018 PRO Tool Holder](#cnc-3018-pro-tool-holder)
 - [Action Camera (GoPro) battery case](#action-camera-gopro-battery-case)
 - [Shifter Knob for Logitech G923](#shifter-knob-for-logitech-g923)
+- [Cat Feeder ](#Cat_Feeder )
 
 ---
 
@@ -87,3 +88,15 @@ Full Bridge Rectifier coaster that fits 90mm cup diameter
 *Shifter Knob for Logitech G923*
 
 [You can check the design here.](https://www.thingiverse.com/thing:7125932)
+
+---
+
+### Cat Feeder 
+
+<p align="center">
+  <img src="/images/Pet_Feeder_System.jpg" alt="Pet Feeder System" style="max-width:100%; height:auto;">
+</p>
+
+*Cat Feeder*
+
+[You can check the design here.](https://www.thingiverse.com/thing:7172071)
