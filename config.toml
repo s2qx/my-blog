@@ -17,60 +17,66 @@ defaultContentLanguageInSubdir = true
       heroSubTitle = "PCB design, 3D enclosures, and microcontroller boards"
 
     [languages.en.menu]
+
       [[languages.en.menu.main]]
         name = "Home"
+        identifier = "nav-home"
         url = "/"
         weight = 1
 
       [[languages.en.menu.main]]
         name = "Projects"
+        identifier = "nav-projects"
         url = "/projects/"
         weight = 2
 
       [[languages.en.menu.main]]
         name = "Personal projects"
+        identifier = "nav-personal-projects"
         url = "/personal-projects/"
         weight = 3
 
-      # ✅ CRITICAL FIX: identifier must be a UNIQUE page path (not "Eco-Drive")
       [[languages.en.menu.main]]
         name = "Eco-Drive"
-        identifier = "/projects/eco-drive"
-        pageRef = "/projects/eco-drive"
+        identifier = "nav-eco-drive"
         url = "/projects/eco-drive/"
         weight = 4
 
-      # ✅ Same rule here
       [[languages.en.menu.main]]
         name = "Smart IoT Electric Extension"
-        identifier = "/projects/smart-iot-electric-extension"
-        pageRef = "/projects/smart-iot-electric-extension"
+        identifier = "nav-smart-iot-electric-extension"
         url = "/projects/smart-iot-electric-extension/"
         weight = 5
 
       [[languages.en.menu.main]]
         name = "Tutorials"
+        identifier = "nav-tutorials"
         url = "/tutorials/"
         weight = 6
 
       [[languages.en.menu.main]]
         name = "3D Design"
+        identifier = "nav-3d-design"
         url = "/3d-design/"
         weight = 7
 
       [[languages.en.menu.main]]
         name = "About"
+        identifier = "nav-about"
         url = "/about/"
         weight = 8
 
       [[languages.en.menu.main]]
         name = "Contact"
+        identifier = "nav-contact"
         url = "/contact/"
         weight = 9
-      [[languages.en.menu.main]]
-        name = "TypeCoach"
-        url = "/typecoach/"
-        weight = 10
+
+[[languages.en.menu.main]]
+  name = "TypeCoach"
+  identifier = "nav-typecoach"
+  url = "/en/typecoach/"
+  weight = 10
 
 [pagination]
   pagerSize = 5
@@ -88,7 +94,7 @@ defaultContentLanguageInSubdir = true
   heroEnable = true
   heroImage = "/images/hero-banner.jpg"
   sidebarShow = true
-  sidebarWidgets = ["search","categories","social","downloads"]
+  sidebarWidgets = ["search", "categories", "social", "downloads"]
   ShowLangSwitch = false
 
 [params.social]

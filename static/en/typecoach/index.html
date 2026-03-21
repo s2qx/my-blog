@@ -1,0 +1,1555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>TypeCoach Pro — Touch Typing Trainer</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=DM+Sans:wght@300;400;500;600&family=Noto+Naskh+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0f0f13;--surface:#17171e;--surface2:#1e1e28;--surface3:#252532;
+  --border:#2a2a38;--border2:#35354a;
+  --text:#e8e8f0;--text2:#9898b0;--text3:#606078;
+  --accent:#6c63ff;--accent2:#8b83ff;--accent-bg:rgba(108,99,255,0.12);
+  --green:#3ddc84;--green-bg:rgba(61,220,132,0.1);
+  --red:#ff5c5c;--red-bg:rgba(255,92,92,0.12);
+  --amber:#ffb347;--amber-bg:rgba(255,179,71,0.1);
+  --blue:#4fc3f7;--blue-bg:rgba(79,195,247,0.1);
+  --pink:#f87cbe;--pink-bg:rgba(248,124,190,0.1);
+  --r:10px;--r2:14px;--r3:20px;
+  --shadow:0 4px 24px rgba(0,0,0,0.4);
+  font-family:'DM Sans',sans-serif;
+}
+[data-theme="light"]{
+  --bg:#f5f5f8;--surface:#ffffff;--surface2:#f0f0f5;--surface3:#e8e8f0;
+  --border:#e0e0eb;--border2:#d0d0e0;
+  --text:#1a1a2e;--text2:#5a5a78;--text3:#9898b0;
+  --accent:#5046e5;--accent2:#6c63ff;--accent-bg:rgba(80,70,229,0.08);
+  --green:#1a9c5b;--green-bg:rgba(26,156,91,0.08);
+  --red:#d63031;--red-bg:rgba(214,48,49,0.08);
+  --amber:#d68000;--amber-bg:rgba(214,128,0,0.08);
+  --blue:#0277bd;--blue-bg:rgba(2,119,189,0.08);
+  --pink:#c2185b;--pink-bg:rgba(194,24,91,0.08);
+}
+body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;transition:background 0.3s,color 0.3s}
+#root{min-height:100vh}
+button{font-family:'DM Sans',sans-serif;cursor:pointer;border:none;transition:all 0.15s}
+input,textarea,select{font-family:'DM Sans',sans-serif}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script>
+const { useState, useEffect, useRef, useCallback, useMemo } = React;
+// ════════════════════════════════════════════════════════════════
+// DATA — ENGLISH LESSONS
+// ════════════════════════════════════════════════════════════════
+const LESSONS = [
+    { id: 1, name: "Home Row — Left", keys: "asdf", level: 1, desc: "Index, middle, ring, pinky on left hand", words: ["add", "ads", "dad", "sad", "fad", "dads", "fads", "sass", "asks", "flask", "flags", "glass", "class", "salad", "falls"] },
+    { id: 2, name: "Home Row — Right", keys: "jkl;", level: 1, desc: "Index, middle, ring, pinky on right hand", words: ["jab", "jak", "lull", "skull", "kill", "skill", "silk", "sill", "fill", "full", "pull", "hulk", "bulk", "sulk", "skull"] },
+    { id: 3, name: "Home Row — Full", keys: "asdf jkl;", level: 1, desc: "All home row keys together", words: ["fall", "flag", "glad", "flask", "skald", "flash", "salad", "black", "glass", "flags", "falls", "class", "shall", "dusk", "flak"] },
+    { id: 4, name: "Add E and I", keys: "ei", level: 2, desc: "Reach up with middle fingers", words: ["fie", "if", "elf", "side", "aide", "file", "idle", "life", "like", "idea", "feel", "fill", "field", "isle", "aisle"] },
+    { id: 5, name: "Add G and H", keys: "gh", level: 2, desc: "Index fingers reach inward", words: ["high", "sigh", "half", "glad", "help", "held", "hill", "hike", "hall", "heal", "flag", "goal", "gale", "hide", "gift"] },
+    { id: 6, name: "Top Row Left — QWERT", keys: "qwert", level: 3, desc: "Left hand top row keys", words: ["tree", "wear", "write", "water", "quest", "quiet", "sweet", "tweet", "enter", "extra", "three", "tower", "worse", "quest", "street"] },
+    { id: 7, name: "Top Row Right — YUIOP", keys: "yuiop", level: 3, desc: "Right hand top row keys", words: ["your", "pour", "ruin", "jury", "upon", "ropy", "yolk", "irony", "ovary", "pout", "input", "lousy", "pouty", "ruby", "tipsy"] },
+    { id: 8, name: "Bottom Row Left — ZXCVB", keys: "zxcvb", level: 4, desc: "Left hand bottom row", words: ["cave", "vibe", "verb", "vice", "zinc", "exact", "back", "black", "brave", "civic", "voice", "cabin", "vibex", "curve", "excel"] },
+    { id: 9, name: "Bottom Row Right — NM", keys: "nm", level: 4, desc: "Right hand bottom row", words: ["name", "mine", "main", "numb", "moon", "mint", "nimble", "nomad", "manic", "manly", "manor", "money", "nerve", "never", "month"] },
+    { id: 10, name: "Full Alphabet", keys: "abcdefghijklmnopqrstuvwxyz", level: 5, desc: "All 26 letters, flowing words", words: ["bright", "clever", "damage", "effect", "finger", "gentle", "handle", "impact", "jungle", "kicked", "launch", "master", "notice", "object", "planet", "quartz", "remote", "system", "target", "unique", "vision", "waited", "yellow", "zipper", "backed", "export"] },
+    { id: 11, name: "Common Words I", keys: "abcdefghijklmnopqrstuvwxyz", level: 5, desc: "Top 100 common English words", words: ["the", "and", "that", "have", "for", "not", "with", "you", "this", "but", "his", "from", "they", "she", "her", "been", "than", "its", "who", "did", "how", "are", "was", "said", "each", "time"] },
+    { id: 12, name: "Common Words II", keys: "abcdefghijklmnopqrstuvwxyz", level: 5, desc: "Natural sentences", words: ["the quick brown fox", "just over the fence", "we learn to type well", "practice makes perfect", "focus on the keys now", "keep your eyes forward", "do not look at your hands", "sit straight and breathe"] },
+    { id: 13, name: "Punctuation Basics", keys: ".,'!?", level: 6, desc: "Most common punctuation marks", words: ["wait,", "okay.", "yes!", "no?", "fine,", "good.", "well,", "sure.", "done!", "nice,", "right?", "next.", "more,", "last.", "done."] },
+    { id: 14, name: "Numbers", keys: "1234567890", level: 6, desc: "Number row practice", words: ["10", "25", "37", "48", "56", "100", "2024", "1983", "400", "99", "55", "30", "72", "64", "88"] },
+    { id: 15, name: "Mixed Challenge", keys: "abcdefghijklmnopqrstuvwxyz0123456789.,'!?", level: 7, desc: "Full keyboard, real sentences", words: ["the best way to type", "is to not look down", "keep your fingers on home", "and trust your muscle memory", "practice every single day", "accuracy beats speed always", "your fingers know the way", "ten minutes a day is enough"] },
+];
+// ════════════════════════════════════════════════════════════════
+// ARABIC LESSONS
+// ════════════════════════════════════════════════════════════════
+const ARABIC_LESSONS = [
+    { id: 'ar1', name: "الحروف الأساسية", keys: "أ ب ت ث", level: 1, desc: "أحرف الصف الأوسط", isArabic: true, words: ["أب", "تب", "ثبت", "أثر", "بات", "ثار", "أبت", "تأب", "باب", "ثابت", "بيت", "تيت", "آب", "أتى", "ثنى"] },
+    { id: 'ar2', name: "حروف الصف الأوسط", keys: "ه و ي ن م ل ك ق ف غ ع ظ ط ض ص ش س ز ر ذ د خ ح ج ث ت ب أ", level: 1, desc: "صف الحروف الأوسط كاملاً", isArabic: true, words: ["بيت", "كتب", "درس", "علم", "فهم", "قرأ", "نظر", "حكم", "صبر", "رسم", "لعب", "جلس", "خرج", "دخل", "نزل"] },
+    { id: 'ar3', name: "كلمات شائعة", keys: "الكلمات", level: 2, desc: "أكثر الكلمات العربية شيوعاً", isArabic: true, words: ["في", "من", "إلى", "على", "مع", "أن", "هو", "هي", "كان", "قد", "لم", "لا", "ما", "هذا", "ذلك"] },
+    { id: 'ar4', name: "جمل قصيرة", keys: "جمل", level: 3, desc: "تدريب على جمل عربية بسيطة", isArabic: true, words: ["مرحبا بك", "كيف حالك", "شكرا جزيلا", "من فضلك", "إلى اللقاء", "صباح الخير", "مساء النور", "ما اسمك", "أنا بخير", "يوم جميل"] },
+    { id: 'ar5', name: "تحدي اللغة العربية", keys: "كل الأحرف", level: 4, desc: "نصوص عربية كاملة", isArabic: true, words: ["التمرين يومياً يبني المهارة", "الصبر والمثابرة طريق النجاح", "اكتب بدون النظر للوحة المفاتيح", "الدقة أهم من السرعة", "ثق بأصابعك"] },
+];
+// ════════════════════════════════════════════════════════════════
+// KEYBOARD MAPS
+// ════════════════════════════════════════════════════════════════
+const FINGER_MAP = {
+    q: 'left-pinky', a: 'left-pinky', z: 'left-pinky',
+    w: 'left-ring', s: 'left-ring', x: 'left-ring',
+    e: 'left-middle', d: 'left-middle', c: 'left-middle',
+    r: 'left-index', f: 'left-index', v: 'left-index', t: 'left-index', g: 'left-index', b: 'left-index',
+    y: 'right-index', h: 'right-index', n: 'right-index', u: 'right-index', j: 'right-index', m: 'right-index',
+    i: 'right-middle', k: 'right-middle', ',': 'right-middle',
+    o: 'right-ring', l: 'right-ring', '.': 'right-ring',
+    p: 'right-pinky', ';': 'right-pinky', '/': 'right-pinky', "'": 'right-pinky',
+};
+const KEYBOARD_LAYOUT = [
+    ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'],
+    ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';'],
+    ['z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '?'],
+];
+const FINGER_COLORS = {
+    'left-pinky': '#ff6b6b', 'left-ring': '#ffa94d', 'left-middle': '#ffd43b', 'left-index': '#69db7c',
+    'right-index': '#4dabf7', 'right-middle': '#da77f2', 'right-ring': '#f783ac', 'right-pinky': '#a9e34b',
+};
+// ════════════════════════════════════════════════════════════════
+// ACHIEVEMENTS
+// ════════════════════════════════════════════════════════════════
+const ACHIEVEMENTS = [
+    { id: 'first_session', icon: '🎯', name: 'First Session', desc: 'Complete your first practice session', check: (store) => store.sessions.length >= 1 },
+    { id: 'streak_3', icon: '🔥', name: 'On Fire', desc: '3-day practice streak', check: (store) => store.streak >= 3 },
+    { id: 'streak_7', icon: '💎', name: 'Diamond Streak', desc: '7-day practice streak', check: (store) => store.streak >= 7 },
+    { id: 'streak_30', icon: '👑', name: 'Champion', desc: '30-day practice streak', check: (store) => store.streak >= 30 },
+    { id: 'acc_90', icon: '🎯', name: 'Sharpshooter', desc: 'Reach 90% accuracy in a session', check: (store) => store.sessions.some(s => s.accuracy >= 90) },
+    { id: 'acc_100', icon: '✨', name: 'Perfectionist', desc: '100% accuracy in a session', check: (store) => store.sessions.some(s => s.accuracy >= 99.9) },
+    { id: 'wpm_30', icon: '⚡', name: 'Lightning Fingers', desc: 'Reach 30 WPM', check: (store) => store.sessions.some(s => s.wpm >= 30) },
+    { id: 'wpm_50', icon: '🚀', name: 'Speed Demon', desc: 'Reach 50 WPM', check: (store) => store.sessions.some(s => s.wpm >= 50) },
+    { id: 'wpm_80', icon: '🏎', name: 'Turbo Typist', desc: 'Reach 80 WPM', check: (store) => store.sessions.some(s => s.wpm >= 80) },
+    { id: 'zero_errors', icon: '🏆', name: 'Zero Mistakes', desc: 'Complete a session with 0 errors', check: (store) => store.sessions.some(s => s.errors === 0 && s.duration > 30) },
+    { id: 'lessons_5', icon: '📚', name: 'Diligent', desc: 'Complete 5 lessons', check: (store) => store.completedLessons.length >= 5 },
+    { id: 'lessons_all', icon: '🎓', name: 'Graduate', desc: 'Complete all lessons', check: (store) => store.completedLessons.length >= LESSONS.length },
+    { id: 'total_hour', icon: '⏱', name: 'Dedicated', desc: 'Practice for 1 hour total', check: (store) => (store.totalTime || 0) >= 3600 },
+    { id: 'weak_drill', icon: '💪', name: 'Face Your Fears', desc: 'Complete a Weak Key drill', check: (store) => store.sessions.some(s => s.mode === 'weak') },
+    { id: 'blind_mode', icon: '🙈', name: 'Eyes Closed', desc: 'Complete a session in Blind Mode', check: (store) => store.sessions.some(s => s.blindMode) },
+    { id: 'arabic_first', icon: '🌙', name: 'Marhaba!', desc: 'Complete an Arabic lesson', check: (store) => store.sessions.some(s => s.isArabic) },
+];
+// ════════════════════════════════════════════════════════════════
+// STORAGE
+// ════════════════════════════════════════════════════════════════
+const STORAGE_KEY = 'typecoach_v2';
+const defaultState = () => ({
+    theme: 'dark',
+    streak: 0,
+    lastPracticeDate: null,
+    xp: 0,
+    level: 1,
+    totalTime: 0,
+    unlockedLessons: [1, 2, 3, 'ar1'],
+    completedLessons: [],
+    sessions: [],
+    keyStats: {},
+    achievements: [],
+    dailyGoals: { sessions: 1, minutes: 10, accuracy: 80 },
+    dailyProgress: { date: null, sessions: 0, minutes: 0, bestAccuracy: 0 },
+    settings: {
+        showKeyboard: false,
+        sessionDuration: 10,
+        typingMode: 'soft',
+        blindMode: false,
+        arabicMode: false,
+    },
+});
+function load() {
+    try {
+        const d = localStorage.getItem(STORAGE_KEY);
+        // also try migrating from v1
+        if (!d) {
+            const old = localStorage.getItem('typecoach_v1');
+            if (old) {
+                const o = JSON.parse(old);
+                return Object.assign(Object.assign(Object.assign({}, defaultState()), o), { settings: Object.assign(Object.assign({}, defaultState().settings), (o.settings || {})) });
+            }
+        }
+        return d ? Object.assign(Object.assign({}, defaultState()), JSON.parse(d)) : defaultState();
+    }
+    catch (_a) {
+        return defaultState();
+    }
+}
+function save(s) { try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(s));
+}
+catch (_a) { } }
+// ════════════════════════════════════════════════════════════════
+// UTILS
+// ════════════════════════════════════════════════════════════════
+function getWeakKeys(keyStats, n = 5) {
+    return Object.entries(keyStats)
+        .filter(([, v]) => v.total > 3)
+        .sort(([, a], [, b]) => (b.errors / b.total) - (a.errors / a.total))
+        .slice(0, n).map(([k]) => k);
+}
+function generateWeakDrillText(weakKeys) {
+    if (!weakKeys.length)
+        return 'asdf jkl; asdf jkl;';
+    const drills = [];
+    weakKeys.forEach(k => {
+        drills.push(k.repeat(5));
+        if (weakKeys.length > 1) {
+            const pair = weakKeys[(weakKeys.indexOf(k) + 1) % weakKeys.length];
+            drills.push((k + pair).repeat(3));
+        }
+    });
+    const allWords = LESSONS.flatMap(l => l.words).filter(w => weakKeys.some(k => w.includes(k)));
+    const picked = allWords.sort(() => Math.random() - 0.5).slice(0, 6);
+    return [...drills, ...picked].sort(() => Math.random() - 0.5).slice(0, 10).join(' ');
+}
+function generateText(lesson, weakKeys = []) {
+    let pool = [...lesson.words];
+    if (weakKeys.length) {
+        const extras = LESSONS.flatMap(l => l.words).filter(w => weakKeys.some(k => w.includes(k)));
+        if (extras.length)
+            pool = [...pool, ...extras, ...extras];
+    }
+    return pool.sort(() => Math.random() - 0.5).slice(0, 8).join(' ');
+}
+function generateCustomText(keys, isArabic = false) {
+    if (!keys.trim())
+        return 'type something here';
+    const ks = keys.toLowerCase().replace(/\s/g, '').split('');
+    if (isArabic)
+        return keys.repeat ? keys + ' ' + keys : keys;
+    const drills = [];
+    ks.forEach(k => { drills.push(k.repeat(4)); });
+    ks.forEach((k, i) => { if (i < ks.length - 1)
+        drills.push(k + ks[i + 1] + k + ks[i + 1]); });
+    const matchWords = LESSONS.flatMap(l => l.words).filter(w => ks.some(k => w.includes(k)));
+    const extra = matchWords.sort(() => Math.random() - 0.5).slice(0, 5);
+    return [...drills, ...extra].sort(() => Math.random() - 0.5).join(' ');
+}
+function calcXpForLevel(l) { return l * 200; }
+function calcLevel(xp) { let l = 1, acc = 0; while (acc + calcXpForLevel(l) <= xp) {
+    acc += calcXpForLevel(l);
+    l++;
+} return l; }
+function fmtTime(s) { const m = Math.floor(s / 60); const sec = s % 60; return `${m}:${sec.toString().padStart(2, '0')}`; }
+function fmtDate(d) { if (!d)
+    return 'Never'; const now = new Date(); const diff = Math.floor((now - new Date(d)) / (1000 * 60 * 60 * 24)); if (diff === 0)
+    return 'Today'; if (diff === 1)
+    return 'Yesterday'; return `${diff}d ago`; }
+function generateCoachFeedback(result, keyStats) {
+    const tips = [];
+    const weakKeys = getWeakKeys(keyStats, 3);
+    const fingerGroups = {
+        'Pinky keys': ['q', 'a', 'z', 'p', ';'],
+        'Ring finger': ['w', 's', 'x', 'o', 'l'],
+        'Middle finger': ['e', 'd', 'c', 'i', 'k'],
+        'Index finger': ['r', 'f', 'v', 't', 'g', 'y', 'h', 'n', 'u', 'j', 'm'],
+    };
+    let worstFinger = null, worstRate = 0;
+    Object.entries(fingerGroups).forEach(([finger, keys]) => {
+        let tot = 0, err = 0;
+        keys.forEach(k => { const st = keyStats[k]; if (st) {
+            tot += st.total;
+            err += st.errors;
+        } });
+        if (tot > 5 && err / tot > worstRate) {
+            worstRate = err / tot;
+            worstFinger = finger;
+        }
+    });
+    if (worstFinger && worstRate > 0.2)
+        tips.push(`⚠ You struggle with ${worstFinger} — try the Weak Key drill.`);
+    if (result.accuracy < 70)
+        tips.push('🎯 Accuracy below 70% — slow down and focus on correct keys, not speed.');
+    else if (result.accuracy >= 95 && result.wpm < 30)
+        tips.push('✨ Great accuracy! Now challenge yourself to increase speed gradually.');
+    else if (result.accuracy >= 90)
+        tips.push('🏆 Excellent accuracy! Your muscle memory is building nicely.');
+    if (result.wpm >= 50)
+        tips.push('🚀 Impressive speed! Make sure accuracy stays above 90%.');
+    if (weakKeys.length)
+        tips.push(`💡 Keys needing attention: ${weakKeys.map(k => `"${k}"`).join(', ')} — try Weak Key Mode.`);
+    if (result.errors === 0)
+        tips.push('💎 Zero errors! Perfect session — your fingers are learning fast.');
+    if (!tips.length)
+        tips.push('👍 Good session! Consistency is the key to improvement.');
+    return tips.slice(0, 3);
+}
+function checkNewAchievements(store, prevAchievements) {
+    const earned = [];
+    ACHIEVEMENTS.forEach(a => {
+        if (!prevAchievements.includes(a.id) && a.check(store))
+            earned.push(a.id);
+    });
+    return earned;
+}
+function exportJSON(store) {
+    const blob = new Blob([JSON.stringify(store, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'typecoach_data.json';
+    a.click();
+    URL.revokeObjectURL(url);
+}
+function exportCSV(sessions) {
+    const header = 'Date,Lesson,Accuracy,WPM,Errors,Duration(s),XP,Mode';
+    const rows = sessions.map(s => [
+        new Date(s.date).toLocaleString(),
+        s.lessonId,
+        Math.round(s.accuracy),
+        Math.round(s.wpm),
+        s.errors,
+        s.duration || 0,
+        s.xpGained || 0,
+        s.mode || 'normal',
+    ].join(','));
+    const blob = new Blob([[header, ...rows].join('\n')], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'typecoach_sessions.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+}
+// ════════════════════════════════════════════════════════════════
+// STYLES
+// ════════════════════════════════════════════════════════════════
+const STYLES = `
+.app{display:flex;flex-direction:column;min-height:100vh}
+.nav{display:flex;align-items:center;justify-content:space-between;padding:0 24px;height:60px;border-bottom:1px solid var(--border);background:var(--surface);position:sticky;top:0;z-index:100;flex-wrap:wrap;gap:8px}
+.nav-logo{font-weight:700;font-size:18px;color:var(--text);display:flex;align-items:center;gap:8px}
+.nav-logo span{color:var(--accent)}
+.nav-tabs{display:flex;gap:2px;flex-wrap:wrap}
+.nav-tab{padding:6px 12px;border-radius:var(--r);border:none;background:transparent;color:var(--text2);font-size:13px;font-weight:500;cursor:pointer;transition:all 0.15s;white-space:nowrap}
+.nav-tab:hover{background:var(--surface2);color:var(--text)}
+.nav-tab.active{background:var(--accent-bg);color:var(--accent)}
+.nav-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.xp-badge{display:flex;align-items:center;gap:6px;background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:4px 12px;font-size:13px;font-weight:500}
+.streak-badge{display:flex;align-items:center;gap:4px;font-size:13px;font-weight:600;color:var(--amber)}
+.lang-badge{padding:4px 10px;border-radius:20px;font-size:12px;font-weight:600;background:var(--pink-bg);color:var(--pink);border:1px solid rgba(248,124,190,0.3);cursor:pointer}
+.lang-badge:hover{opacity:0.8}
+.theme-btn{width:34px;height:34px;border-radius:var(--r);border:1px solid var(--border);background:var(--surface2);color:var(--text2);font-size:16px;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.page{padding:32px 24px;max-width:960px;margin:0 auto;width:100%}
+.page-wide{padding:32px 24px;max-width:1100px;margin:0 auto;width:100%}
+
+/* Cards & layout */
+.hero{background:linear-gradient(135deg,var(--accent-bg),transparent);border:1px solid var(--border2);border-radius:var(--r3);padding:32px;margin-bottom:24px}
+.hero h1{font-size:26px;font-weight:700;margin-bottom:8px}
+.hero p{color:var(--text2);font-size:15px}
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:24px}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r2);padding:18px;transition:border-color 0.2s}
+.stat-card:hover{border-color:var(--border2)}
+.stat-card .label{font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:var(--text3);margin-bottom:6px}
+.stat-card .value{font-size:26px;font-weight:700;line-height:1}
+.stat-card .sub{font-size:11px;color:var(--text2);margin-top:4px}
+.stat-card.green .value{color:var(--green)}
+.stat-card.accent .value{color:var(--accent)}
+.stat-card.amber .value{color:var(--amber)}
+.stat-card.pink .value{color:var(--pink)}
+.section-title{font-size:13px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+
+/* Lessons */
+.lesson-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+.lesson-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r2);padding:18px;cursor:pointer;transition:all 0.15s;position:relative;overflow:hidden}
+.lesson-card:hover:not(.locked){border-color:var(--accent);transform:translateY(-1px);box-shadow:var(--shadow)}
+.lesson-card.locked{opacity:0.45;cursor:not-allowed}
+.lesson-card.completed::after{content:'✓';position:absolute;top:12px;right:14px;color:var(--green);font-weight:700;font-size:16px}
+.lesson-card.arabic-card{border-left:3px solid var(--pink)}
+.lesson-tag{display:inline-flex;align-items:center;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px}
+.lesson-tag.l1{background:var(--green-bg);color:var(--green)}
+.lesson-tag.l2{background:var(--blue-bg);color:var(--blue)}
+.lesson-tag.l3{background:var(--accent-bg);color:var(--accent)}
+.lesson-tag.l4{background:var(--amber-bg);color:var(--amber)}
+.lesson-tag.l5{background:var(--red-bg);color:var(--red)}
+.lesson-tag.arabic{background:var(--pink-bg);color:var(--pink)}
+.lesson-card h3{font-size:14px;font-weight:600;margin-bottom:4px}
+.lesson-card p{font-size:12px;color:var(--text2)}
+.lesson-keys{font-family:'JetBrains Mono',monospace;font-size:11px;background:var(--surface2);padding:3px 8px;border-radius:6px;color:var(--text2);margin-top:8px;display:inline-block}
+
+/* Practice */
+.practice-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px}
+.practice-stats{display:flex;gap:10px;flex-wrap:wrap}
+.stat-pill{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:30px;padding:6px 14px}
+.stat-pill .sp-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:0.05em}
+.stat-pill .sp-val{font-size:16px;font-weight:700;font-family:'JetBrains Mono',monospace}
+.stat-pill.sp-acc .sp-val{color:var(--green)}
+.stat-pill.sp-wpm .sp-val{color:var(--accent2)}
+.stat-pill.sp-timer .sp-val{color:var(--amber)}
+.stat-pill.sp-err .sp-val{color:var(--red)}
+.stat-pill.sp-net .sp-val{color:var(--blue)}
+
+.typing-area{background:var(--surface);border:1px solid var(--border);border-radius:var(--r2);padding:28px;margin-bottom:16px;min-height:140px;position:relative;cursor:text}
+.typing-display{font-family:'JetBrains Mono',monospace;font-size:26px;line-height:1.7;letter-spacing:0.02em;user-select:none;word-break:break-word;min-height:80px}
+.typing-display.arabic-display{font-family:'Noto Naskh Arabic',serif;font-size:28px;direction:rtl;text-align:right;letter-spacing:0}
+.char{position:relative;transition:color 0.05s}
+.char.correct{color:var(--text2)}
+.char.error{color:var(--red);background:var(--red-bg);border-radius:2px}
+.char.current{color:var(--text);background:var(--accent);border-radius:3px}
+.char.pending{color:var(--text3)}
+.char.blind{color:transparent;background:var(--surface2);border-radius:2px;min-width:8px;display:inline-block}
+.char.blind.current{background:var(--accent)}
+.char.blind.error{background:var(--red-bg)}
+
+.focus-banner{border-radius:var(--r);padding:10px 16px;margin-bottom:14px;display:flex;align-items:center;gap:8px;font-size:13px;font-weight:500;flex-wrap:wrap;gap:8px}
+.focus-banner.eyes{background:var(--amber-bg);border:1px solid rgba(255,179,71,0.3);color:var(--amber)}
+.focus-banner.blind{background:var(--blue-bg);border:1px solid rgba(79,195,247,0.3);color:var(--blue)}
+.focus-banner.strict{background:var(--red-bg);border:1px solid rgba(255,92,92,0.25);color:var(--red)}
+.focus-banner.weak{background:var(--pink-bg);border:1px solid rgba(248,124,190,0.3);color:var(--pink)}
+.focus-banner.paused{background:var(--surface3);border:1px solid var(--border2);color:var(--text2)}
+
+.btn{padding:10px 18px;border-radius:var(--r);font-size:14px;font-weight:600;cursor:pointer;transition:all 0.15s;display:inline-flex;align-items:center;gap:6px}
+.btn-primary{background:var(--accent);color:#fff;border:none}
+.btn-primary:hover{opacity:0.88}
+.btn-secondary{background:var(--surface2);color:var(--text);border:1px solid var(--border)}
+.btn-secondary:hover{border-color:var(--border2)}
+.btn-sm{padding:6px 12px;font-size:12px}
+.btn-danger{background:var(--red-bg);color:var(--red);border:1px solid rgba(255,92,92,0.3)}
+.btn-pink{background:var(--pink-bg);color:var(--pink);border:1px solid rgba(248,124,190,0.3)}
+.btn-green{background:var(--green-bg);color:var(--green);border:1px solid rgba(61,220,132,0.3)}
+.btn-amber{background:var(--amber-bg);color:var(--amber);border:1px solid rgba(255,179,71,0.3)}
+
+.lesson-focus{display:flex;align-items:center;gap:8px;background:var(--surface2);border-radius:var(--r);padding:8px 14px;font-size:13px;color:var(--text2);margin-bottom:14px;flex-wrap:wrap}
+.lesson-focus strong{color:var(--accent)}
+
+.mode-bar{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
+.mode-chip{padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;border:1px solid var(--border);background:var(--surface2);color:var(--text2);cursor:pointer;transition:all 0.15s}
+.mode-chip.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.mode-chip.active.blind-chip{background:var(--blue);border-color:var(--blue)}
+.mode-chip.active.strict-chip{background:var(--red);border-color:var(--red)}
+.mode-chip.active.pause-chip{background:var(--amber);border-color:var(--amber)}
+
+.keyboard-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--r2);padding:18px;margin-top:14px}
+.keyboard-row{display:flex;justify-content:center;gap:5px;margin-bottom:5px}
+.key{display:flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:6px;font-size:12px;font-weight:600;border:1px solid var(--border2);background:var(--surface2);color:var(--text2);font-family:'JetBrains Mono',monospace;transition:all 0.1s;position:relative;flex-shrink:0}
+.key.active-key{transform:scale(1.18);box-shadow:0 0 0 3px var(--accent);background:var(--accent);color:#fff;border-color:var(--accent)}
+.key.error-key{background:var(--red-bg);border-color:var(--red);color:var(--red)}
+.space-key{width:180px}
+.finger-dot{width:5px;height:5px;border-radius:50%;position:absolute;bottom:3px;right:3px}
+
+/* Progress bars */
+.progress-bar{height:5px;background:var(--surface2);border-radius:3px;overflow:hidden;margin-top:6px}
+.progress-fill{height:100%;border-radius:3px;transition:width 0.4s ease;background:var(--accent)}
+.progress-fill.green{background:var(--green)}
+.progress-fill.amber{background:var(--amber)}
+.progress-fill.red{background:var(--red)}
+.progress-fill.pink{background:var(--pink)}
+
+/* Results */
+.result-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r2);padding:36px;text-align:center;margin-bottom:16px}
+.result-score{font-size:72px;font-weight:800;font-family:'JetBrains Mono',monospace;line-height:1}
+.result-grade{font-size:22px;font-weight:700;margin-top:8px}
+.result-stats{display:flex;gap:20px;justify-content:center;margin:20px 0;flex-wrap:wrap}
+.result-stat .rs-val{font-size:28px;font-weight:700}
+.result-stat .rs-label{font-size:11px;color:var(--text2);margin-top:4px;text-transform:uppercase;letter-spacing:0.05em}
+.badge{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:20px;font-size:12px;font-weight:600}
+.badge-gold{background:rgba(255,179,71,0.15);color:var(--amber);border:1px solid rgba(255,179,71,0.3)}
+.badge-green{background:var(--green-bg);color:var(--green);border:1px solid rgba(61,220,132,0.3)}
+.badge-blue{background:var(--blue-bg);color:var(--blue);border:1px solid rgba(79,195,247,0.3)}
+
+.coach-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r2);padding:20px;margin-bottom:16px}
+.coach-tip{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
+.coach-tip:last-child{border-bottom:none;padding-bottom:0}
+
+/* Analytics */
+.chart-area{height:140px;position:relative;margin:8px 0}
+.chart-bars{display:flex;align-items:flex-end;gap:4px;height:100%}
+.chart-bar{flex:1;border-radius:3px 3px 0 0;min-height:4px;transition:height 0.4s ease;cursor:pointer;position:relative}
+.chart-bar:hover::after{content:attr(data-tip);position:absolute;bottom:100%;left:50%;transform:translateX(-50%);background:var(--surface3);border:1px solid var(--border);border-radius:6px;padding:4px 8px;font-size:11px;white-space:nowrap;margin-bottom:4px;color:var(--text);z-index:10}
+
+.page-tabs{display:flex;gap:3px;margin-bottom:20px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:4px}
+.page-tab{flex:1;padding:7px;border-radius:6px;border:none;background:transparent;color:var(--text2);font-size:12px;font-weight:500;cursor:pointer;transition:all 0.15s;white-space:nowrap}
+.page-tab.active{background:var(--accent);color:#fff}
+
+.finger-guide{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.finger-chip{display:flex;align-items:center;gap:5px;padding:3px 8px;border-radius:20px;font-size:11px;font-weight:500;border:1px solid var(--border)}
+.finger-dot-lg{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+
+/* Goals */
+.goal-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r2);padding:18px;margin-bottom:12px}
+.goal-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.goal-label{font-size:13px;font-weight:500}
+.goal-value{font-size:13px;color:var(--text2)}
+.goal-done{color:var(--green);font-weight:700}
+
+/* Achievements */
+.ach-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+.ach-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r2);padding:14px;display:flex;align-items:center;gap:12px;transition:all 0.2s}
+.ach-card.earned{border-color:var(--amber);background:rgba(255,179,71,0.05)}
+.ach-card.locked{opacity:0.4}
+.ach-icon{font-size:24px;flex-shrink:0}
+.ach-info h4{font-size:13px;font-weight:600;margin-bottom:2px}
+.ach-info p{font-size:11px;color:var(--text2)}
+
+/* Notify toast */
+.toast-wrap{position:fixed;top:70px;right:16px;z-index:999;display:flex;flex-direction:column;gap:8px;pointer-events:none}
+.toast{background:var(--surface);border:1px solid var(--amber);border-radius:var(--r);padding:10px 16px;font-size:13px;font-weight:500;color:var(--amber);box-shadow:var(--shadow);animation:slideIn 0.3s ease,fadeOut 0.4s ease 3.6s forwards;pointer-events:none;max-width:280px}
+@keyframes slideIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
+@keyframes fadeOut{from{opacity:1}to{opacity:0}}
+
+/* Animations */
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-4px)}40%,80%{transform:translateX(4px)}}
+.shake{animation:shake 0.25s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.fade-in{animation:fadeIn 0.3s ease}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}
+.pulse{animation:pulse 1s ease infinite}
+
+/* Custom practice */
+.custom-keys-input{width:100%;padding:12px;border-radius:var(--r);border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:16px;outline:none;font-family:'JetBrains Mono',monospace}
+.custom-keys-input:focus{border-color:var(--accent)}
+
+/* RTL support */
+[dir="rtl"] .typing-display{direction:rtl;text-align:right}
+
+/* Pause overlay */
+.pause-overlay{position:absolute;inset:0;background:rgba(0,0,0,0.7);border-radius:var(--r2);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;z-index:10}
+.pause-overlay h2{font-size:28px;font-weight:700;color:#fff}
+.pause-overlay p{color:rgba(255,255,255,0.6);font-size:14px}
+
+@media(max-width:640px){
+  .nav{height:auto;padding:10px 12px}.nav-tabs{gap:0}.nav-tab{padding:5px 8px;font-size:11px}
+  .typing-display{font-size:20px}.result-score{font-size:52px}
+  .stat-pill .sp-val{font-size:14px}
+}
+`;
+// ════════════════════════════════════════════════════════════════
+// TOAST SYSTEM
+// ════════════════════════════════════════════════════════════════
+function ToastContainer({ toasts }) {
+    return (React.createElement("div", { className: "toast-wrap" }, toasts.map(t => React.createElement("div", { key: t.id, className: "toast" }, t.msg))));
+}
+// ════════════════════════════════════════════════════════════════
+// MAIN APP
+// ════════════════════════════════════════════════════════════════
+function App() {
+    var _a;
+    const [store, setStore] = useState(load);
+    const [page, setPage] = useState('dashboard');
+    const [activeLesson, setActiveLesson] = useState(null);
+    const [practiceState, setPracticeState] = useState(null);
+    const [practiceMode, setPracticeMode] = useState('lesson'); // 'lesson'|'weak'|'custom'
+    const [customConfig, setCustomConfig] = useState(null);
+    const [toasts, setToasts] = useState([]);
+    useEffect(() => { save(store); }, [store]);
+    useEffect(() => {
+        const today = new Date().toDateString();
+        if (store.lastPracticeDate !== today) {
+            const yesterday = new Date(Date.now() - 86400000).toDateString();
+            if (store.lastPracticeDate && store.lastPracticeDate !== today && store.lastPracticeDate !== yesterday) {
+                setStore(s => (Object.assign(Object.assign({}, s), { streak: 0 })));
+            }
+        }
+    }, []);
+    const addToast = (msg) => {
+        const id = Date.now();
+        setToasts(t => [...t, { id, msg }]);
+        setTimeout(() => setToasts(t => t.filter(x => x.id !== id)), 4000);
+    };
+    const updateStore = (updater) => setStore(s => (Object.assign(Object.assign({}, s), updater(s))));
+    const startLesson = (lesson, mode = 'lesson') => {
+        setActiveLesson(lesson);
+        setPracticeMode(mode);
+        setPage('practice');
+        setPracticeState(null);
+    };
+    const startCustom = (config) => {
+        setCustomConfig(config);
+        setPracticeMode('custom');
+        setActiveLesson({ id: 'custom', name: 'Custom Drill', keys: config.keys, level: 1, desc: 'Custom key practice', words: [], isArabic: config.isArabic });
+        setPage('practice');
+        setPracticeState(null);
+    };
+    const startWeakMode = () => {
+        const weakKeys = getWeakKeys(store.keyStats);
+        if (!weakKeys.length) {
+            addToast('Practice more lessons first to detect weak keys!');
+            return;
+        }
+        setActiveLesson({ id: 'weak', name: 'Weak Key Drill', keys: weakKeys.join(''), level: 1, desc: `Targeting: ${weakKeys.join(', ')}`, words: [], isWeak: true });
+        setPracticeMode('weak');
+        setPage('practice');
+        setPracticeState(null);
+    };
+    const finishSession = (result) => {
+        var _a;
+        const today = new Date().toDateString();
+        const xpGained = Math.floor(result.accuracy / 10) + Math.floor(result.wpm / 5) + 10 + (result.errors === 0 ? 20 : 0);
+        const newXp = store.xp + xpGained;
+        const newLevel = calcLevel(newXp);
+        const isNewDay = store.lastPracticeDate !== today;
+        const yesterday = new Date(Date.now() - 86400000).toDateString();
+        const newStreak = isNewDay ? (store.lastPracticeDate === yesterday ? store.streak + 1 : 1) : store.streak;
+        let newUnlocked = [...store.unlockedLessons];
+        let newCompleted = [...store.completedLessons];
+        if (result.accuracy >= 80 && activeLesson.id !== 'weak' && activeLesson.id !== 'custom') {
+            if (!newCompleted.includes(activeLesson.id))
+                newCompleted.push(activeLesson.id);
+            const nextId = typeof activeLesson.id === 'number' ? activeLesson.id + 1 : null;
+            if (nextId && nextId <= LESSONS.length && !newUnlocked.includes(nextId))
+                newUnlocked.push(nextId);
+            if (nextId && nextId + 1 <= LESSONS.length && !newUnlocked.includes(nextId + 1))
+                newUnlocked.push(nextId + 1);
+        }
+        const newKeyStats = Object.assign({}, store.keyStats);
+        Object.entries(result.keyStats || {}).forEach(([k, v]) => {
+            if (!newKeyStats[k])
+                newKeyStats[k] = { total: 0, errors: 0 };
+            newKeyStats[k].total += v.total;
+            newKeyStats[k].errors += v.errors;
+        });
+        // daily goals
+        const dp = store.dailyProgress || {};
+        const isToday = dp.date === today;
+        const newDP = {
+            date: today,
+            sessions: (isToday ? (dp.sessions || 0) : 0) + 1,
+            minutes: (isToday ? (dp.minutes || 0) : 0) + Math.floor((result.duration || 0) / 60),
+            bestAccuracy: Math.max(isToday ? (dp.bestAccuracy || 0) : 0, result.accuracy),
+        };
+        const newSession = Object.assign(Object.assign({}, result), { lessonId: activeLesson.id, date: new Date().toISOString(), xpGained, mode: practiceMode, isArabic: activeLesson.isArabic || false, blindMode: ((_a = store.settings) === null || _a === void 0 ? void 0 : _a.blindMode) || false });
+        const newSessions = [...store.sessions, newSession].slice(-100);
+        const newStore = Object.assign(Object.assign({}, store), { xp: newXp, level: newLevel, streak: newStreak, lastPracticeDate: today, completedLessons: newCompleted, unlockedLessons: newUnlocked, totalTime: (store.totalTime || 0) + (result.duration || 0), keyStats: newKeyStats, sessions: newSessions, dailyProgress: newDP });
+        // check achievements
+        const prevAch = store.achievements || [];
+        const newAch = checkNewAchievements(newStore, prevAch);
+        if (newAch.length) {
+            newStore.achievements = [...prevAch, ...newAch];
+            newAch.forEach(id => {
+                const a = ACHIEVEMENTS.find(x => x.id === id);
+                if (a)
+                    setTimeout(() => addToast(`${a.icon} Achievement unlocked: ${a.name}!`), 500);
+            });
+        }
+        if (newLevel > store.level)
+            addToast(`⚡ Level Up! You're now Level ${newLevel}!`);
+        setStore(newStore);
+        setPracticeState(Object.assign(Object.assign({}, result), { xpGained }));
+    };
+    const theme = store.theme || 'dark';
+    const toggleTheme = () => updateStore(() => ({ theme: theme === 'dark' ? 'light' : 'dark' }));
+    const isArabic = ((_a = store.settings) === null || _a === void 0 ? void 0 : _a.arabicMode) || false;
+    const weakKeys = getWeakKeys(store.keyStats);
+    const weekSessions = store.sessions.filter(s => { const d = new Date(s.date); return (Date.now() - d) < 7 * 86400000; });
+    const avgAcc = weekSessions.length ? Math.round(weekSessions.reduce((a, s) => a + s.accuracy, 0) / weekSessions.length) : 0;
+    const avgWpm = weekSessions.length ? Math.round(weekSessions.reduce((a, s) => a + s.wpm, 0) / weekSessions.length) : 0;
+    const NAV_TABS = [
+        { id: 'dashboard', label: 'Dashboard' },
+        { id: 'lessons', label: 'Lessons' },
+        { id: 'practice', label: 'Practice' },
+        { id: 'custom', label: 'Custom' },
+        { id: 'analytics', label: 'Analytics' },
+        { id: 'achievements', label: 'Badges' },
+        { id: 'settings', label: 'Settings' },
+    ];
+    return (React.createElement("div", { "data-theme": theme, className: "app" },
+        React.createElement("style", null, STYLES),
+        React.createElement(ToastContainer, { toasts: toasts }),
+        React.createElement("nav", { className: "nav" },
+            React.createElement("div", { className: "nav-logo" },
+                "\u2328 ",
+                React.createElement("span", null, "Type"),
+                "Coach ",
+                React.createElement("span", { style: { fontSize: 11, background: 'var(--accent)', color: '#fff', padding: '2px 6px', borderRadius: 4, marginLeft: 4 } }, "PRO")),
+            React.createElement("div", { className: "nav-tabs" }, NAV_TABS.map(t => (React.createElement("button", { key: t.id, className: `nav-tab${page === t.id ? ' active' : ''}`, onClick: () => { if (t.id !== 'practice')
+                    setPage(t.id);
+                else if (activeLesson)
+                    setPage('practice');
+                else
+                    setPage('lessons'); } }, t.label)))),
+            React.createElement("div", { className: "nav-right" },
+                React.createElement("span", { className: "streak-badge" },
+                    "\uD83D\uDD25 ",
+                    store.streak),
+                React.createElement("div", { className: "xp-badge" },
+                    "\u26A1 ",
+                    store.xp,
+                    " XP \u00B7 Lv",
+                    store.level || 1),
+                React.createElement("div", { className: "lang-badge", onClick: () => updateStore(s => { var _a; return ({ settings: Object.assign(Object.assign({}, s.settings), { arabicMode: !((_a = s.settings) === null || _a === void 0 ? void 0 : _a.arabicMode) }) }); }) }, isArabic ? '🌙 عربي' : '🌍 EN'),
+                React.createElement("button", { className: "theme-btn", onClick: toggleTheme }, theme === 'dark' ? '☀' : '🌙'))),
+        page === 'dashboard' && React.createElement(Dashboard, { store: store, onStart: startLesson, onWeakMode: startWeakMode, weakKeys: weakKeys, avgAcc: avgAcc, avgWpm: avgWpm, isArabic: isArabic }),
+        page === 'lessons' && React.createElement(LessonsPage, { store: store, onStart: startLesson, isArabic: isArabic }),
+        page === 'practice' && (activeLesson
+            ? practiceState
+                ? React.createElement(ResultScreen, { result: practiceState, lesson: activeLesson, keyStats: store.keyStats, onRetry: () => setPracticeState(null), onNext: () => { const nx = LESSONS.find(l => l.id === activeLesson.id + 1 && store.unlockedLessons.includes(l.id)); if (nx) {
+                        setActiveLesson(nx);
+                        setPracticeState(null);
+                    }
+                    else
+                        setPage('lessons'); }, onDash: () => setPage('dashboard'), store: store })
+                : React.createElement(PracticeScreen, { lesson: activeLesson, store: store, practiceMode: practiceMode, customConfig: customConfig, onFinish: finishSession, onBack: () => setPage('lessons') })
+            : React.createElement("div", { className: "page" },
+                React.createElement("div", { style: { textAlign: 'center', padding: '80px 0', color: 'var(--text2)' } },
+                    React.createElement("div", { style: { fontSize: 48, marginBottom: 16 } }, "\u2328"),
+                    React.createElement("div", { style: { fontSize: 20, fontWeight: 600, marginBottom: 8 } }, "No lesson selected"),
+                    React.createElement("button", { className: "btn btn-primary", onClick: () => setPage('lessons') }, "Browse Lessons")))),
+        page === 'custom' && React.createElement(CustomPage, { onStart: startCustom, store: store }),
+        page === 'analytics' && React.createElement(AnalyticsPage, { store: store }),
+        page === 'achievements' && React.createElement(AchievementsPage, { store: store }),
+        page === 'settings' && React.createElement(SettingsPage, { store: store, updateStore: updateStore })));
+}
+// ════════════════════════════════════════════════════════════════
+// DASHBOARD
+// ════════════════════════════════════════════════════════════════
+function Dashboard({ store, onStart, onWeakMode, weakKeys, avgAcc, avgWpm, isArabic }) {
+    const today = new Date().toDateString();
+    const practicedToday = store.lastPracticeDate === today;
+    const nextLesson = LESSONS.find(l => store.unlockedLessons.includes(l.id) && !store.completedLessons.includes(l.id));
+    const totalMinutes = Math.floor((store.totalTime || 0) / 60);
+    const dp = store.dailyProgress || {};
+    const isToday = dp.date === today;
+    const goals = store.dailyGoals || { sessions: 1, minutes: 10, accuracy: 80 };
+    const dSessions = isToday ? (dp.sessions || 0) : 0;
+    const dMinutes = isToday ? (dp.minutes || 0) : 0;
+    const dAcc = isToday ? (dp.bestAccuracy || 0) : 0;
+    const earnedAch = (store.achievements || []).length;
+    function hour2time() { const h = new Date().getHours(); if (h < 12)
+        return 'morning'; if (h < 17)
+        return 'afternoon'; return 'evening'; }
+    return (React.createElement("div", { className: "page fade-in" },
+        React.createElement("div", { className: "hero" },
+            React.createElement("h1", null,
+                "Good ",
+                hour2time(),
+                ", Touch Typist \uD83D\uDC4B"),
+            React.createElement("p", null, practicedToday ? "You've already practiced today — keep the streak alive!" : "Ready for today's session? 5 minutes a day builds real muscle memory."),
+            React.createElement("div", { style: { display: 'flex', gap: 10, marginTop: 20, flexWrap: 'wrap' } },
+                nextLesson && React.createElement("button", { className: "btn btn-primary", onClick: () => onStart(nextLesson) },
+                    "Continue: ",
+                    nextLesson.name,
+                    " \u2192"),
+                React.createElement("button", { className: "btn btn-pink", onClick: onWeakMode },
+                    "\uD83D\uDCAA Weak Key Drill ",
+                    weakKeys.length ? `(${weakKeys.join('')})` : ''))),
+        React.createElement("div", { className: "section-title" }, "\uD83D\uDCC5 Today's Goals"),
+        React.createElement("div", { style: { background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--r2)', padding: 20, marginBottom: 24 } },
+            React.createElement("div", { style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(180px,1fr))', gap: 16 } }, [
+                { label: 'Sessions', done: dSessions, goal: goals.sessions, unit: '', color: 'var(--accent)' },
+                { label: 'Minutes', done: dMinutes, goal: goals.minutes, unit: 'min', color: 'var(--blue)' },
+                { label: 'Best Accuracy', done: Math.round(dAcc), goal: goals.accuracy, unit: '%', color: 'var(--green)' },
+            ].map(({ label, done, goal, unit, color }) => {
+                const pct = Math.min(done / goal * 100, 100);
+                const isDone = done >= goal;
+                return (React.createElement("div", { key: label },
+                    React.createElement("div", { style: { display: 'flex', justifyContent: 'space-between', marginBottom: 6 } },
+                        React.createElement("span", { style: { fontSize: 13, fontWeight: 500 } }, label),
+                        React.createElement("span", { style: { fontSize: 13, color: isDone ? 'var(--green)' : 'var(--text2)', fontWeight: isDone ? 700 : 400 } },
+                            done,
+                            unit,
+                            " / ",
+                            goal,
+                            unit,
+                            " ",
+                            isDone ? '✓' : '')),
+                    React.createElement("div", { className: "progress-bar" },
+                        React.createElement("div", { className: "progress-fill", style: { width: `${pct}%`, background: color } }))));
+            }))),
+        React.createElement("div", { className: "stat-grid" },
+            React.createElement("div", { className: "stat-card amber" },
+                React.createElement("div", { className: "label" }, "Daily Streak"),
+                React.createElement("div", { className: "value" },
+                    "\uD83D\uDD25 ",
+                    store.streak),
+                React.createElement("div", { className: "sub" }, "days in a row")),
+            React.createElement("div", { className: "stat-card accent" },
+                React.createElement("div", { className: "label" }, "Total XP"),
+                React.createElement("div", { className: "value" }, store.xp),
+                React.createElement("div", { className: "sub" },
+                    "Level ",
+                    store.level || 1)),
+            React.createElement("div", { className: "stat-card green" },
+                React.createElement("div", { className: "label" }, "Avg Accuracy"),
+                React.createElement("div", { className: "value" },
+                    avgAcc || '—',
+                    "%"),
+                React.createElement("div", { className: "sub" }, "this week")),
+            React.createElement("div", { className: "stat-card" },
+                React.createElement("div", { className: "label" }, "Avg WPM"),
+                React.createElement("div", { className: "value" }, avgWpm || '—'),
+                React.createElement("div", { className: "sub" }, "this week")),
+            React.createElement("div", { className: "stat-card" },
+                React.createElement("div", { className: "label" }, "Lessons Done"),
+                React.createElement("div", { className: "value" }, store.completedLessons.length),
+                React.createElement("div", { className: "sub" },
+                    "of ",
+                    LESSONS.length)),
+            React.createElement("div", { className: "stat-card pink" },
+                React.createElement("div", { className: "label" }, "Badges"),
+                React.createElement("div", { className: "value" }, earnedAch),
+                React.createElement("div", { className: "sub" },
+                    "of ",
+                    ACHIEVEMENTS.length)),
+            React.createElement("div", { className: "stat-card" },
+                React.createElement("div", { className: "label" }, "Practice Time"),
+                React.createElement("div", { className: "value" }, totalMinutes),
+                React.createElement("div", { className: "sub" }, "minutes total"))),
+        weakKeys.length > 0 && (React.createElement("div", { style: { background: 'var(--red-bg)', border: '1px solid rgba(255,92,92,0.2)', borderRadius: 'var(--r2)', padding: 18, marginBottom: 20 } },
+            React.createElement("div", { className: "section-title", style: { color: 'var(--red)', marginBottom: 8 } }, "\u26A0 Weak Keys Detected"),
+            React.createElement("p", { style: { fontSize: 13, color: 'var(--text2)', marginBottom: 12 } }, "These keys have the highest error rate. Target them with a Weak Key drill!"),
+            React.createElement("div", { style: { display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 12 } }, weakKeys.map(k => (React.createElement("span", { key: k, style: { background: 'var(--red-bg)', border: '1px solid rgba(255,92,92,0.4)', borderRadius: 6, padding: '4px 12px', fontFamily: 'JetBrains Mono', fontSize: 18, fontWeight: 700, color: 'var(--red)' } }, k)))),
+            React.createElement("button", { className: "btn btn-danger btn-sm", onClick: onWeakMode }, "Start Weak Key Drill \u2192"))),
+        React.createElement("div", { className: "section-title" }, "Recent Sessions"),
+        store.sessions.length === 0
+            ? React.createElement("div", { style: { textAlign: 'center', padding: 40, color: 'var(--text3)' } }, "No sessions yet \u2014 start your first lesson!")
+            : React.createElement("div", { style: { display: 'flex', flexDirection: 'column', gap: 8 } }, store.sessions.slice(-5).reverse().map((s, i) => {
+                const l = LESSONS.find(l => l.id === s.lessonId) || ARABIC_LESSONS.find(l => l.id === s.lessonId) || { name: s.mode === 'weak' ? 'Weak Key Drill' : s.mode === 'custom' ? 'Custom Drill' : '?' };
+                return (React.createElement("div", { key: i, style: { background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--r)', padding: '12px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8 } },
+                    React.createElement("div", null,
+                        React.createElement("div", { style: { fontWeight: 600, fontSize: 13, display: 'flex', alignItems: 'center', gap: 6 } },
+                            l.name,
+                            s.blindMode && React.createElement("span", { className: "badge badge-blue", style: { padding: '1px 6px', fontSize: 10 } }, "blind"),
+                            s.isArabic && React.createElement("span", { className: "badge", style: { padding: '1px 6px', fontSize: 10, background: 'var(--pink-bg)', color: 'var(--pink)', border: '1px solid rgba(248,124,190,0.3)' } }, "\u0639\u0631\u0628\u064A")),
+                        React.createElement("div", { style: { fontSize: 11, color: 'var(--text3)' } }, fmtDate(s.date))),
+                    React.createElement("div", { style: { display: 'flex', gap: 14, alignItems: 'center' } },
+                        React.createElement("div", { style: { textAlign: 'center' } },
+                            React.createElement("div", { style: { fontFamily: 'JetBrains Mono', fontWeight: 700, color: s.accuracy >= 90 ? 'var(--green)' : s.accuracy >= 70 ? 'var(--amber)' : 'var(--red)' } },
+                                Math.round(s.accuracy),
+                                "%"),
+                            React.createElement("div", { style: { fontSize: 10, color: 'var(--text3)' } }, "acc")),
+                        React.createElement("div", { style: { textAlign: 'center' } },
+                            React.createElement("div", { style: { fontFamily: 'JetBrains Mono', fontWeight: 700, color: 'var(--accent)' } }, Math.round(s.wpm)),
+                            React.createElement("div", { style: { fontSize: 10, color: 'var(--text3)' } }, "wpm")),
+                        React.createElement("span", { className: `badge ${s.accuracy >= 90 ? 'badge-gold' : 'badge-green'}` }, s.accuracy >= 90 ? '🏆 Elite' : s.accuracy >= 80 ? '✨ Good' : '💪 Keep going'))));
+            }))));
+}
+// ════════════════════════════════════════════════════════════════
+// LESSONS PAGE
+// ════════════════════════════════════════════════════════════════
+function LessonsPage({ store, onStart, isArabic }) {
+    const [tab, setTab] = useState(isArabic ? 'arabic' : 'english');
+    const levelNames = { 1: 'Beginner', 2: 'Easy', 3: 'Intermediate', 4: 'Advanced', 5: 'Proficient', 6: 'Expert', 7: 'Master' };
+    const levelColors = { 1: 'l1', 2: 'l2', 3: 'l3', 4: 'l4', 5: 'l5', 6: 'l5', 7: 'l5' };
+    const renderLesson = (l, isAr = false) => {
+        const unlocked = store.unlockedLessons.includes(l.id);
+        const completed = store.completedLessons.includes(l.id);
+        return (React.createElement("div", { key: l.id, className: `lesson-card${!unlocked ? ' locked' : ''}${completed ? ' completed' : ''}${isAr ? ' arabic-card' : ''}`, onClick: () => unlocked && onStart(l) },
+            React.createElement("div", { className: `lesson-tag ${isAr ? 'arabic' : levelColors[l.level] || 'l1'}` }, isAr ? 'عربي' : levelNames[l.level] || 'Level ' + l.level),
+            React.createElement("h3", null, l.name),
+            React.createElement("p", null, l.desc),
+            React.createElement("div", { className: "lesson-keys" }, l.keys),
+            !unlocked && React.createElement("div", { style: { marginTop: 8, fontSize: 11, color: 'var(--text3)' } }, "\uD83D\uDD12 Complete previous lessons to unlock")));
+    };
+    return (React.createElement("div", { className: "page fade-in" },
+        React.createElement("div", { style: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20, flexWrap: 'wrap', gap: 12 } },
+            React.createElement("div", null,
+                React.createElement("h2", { style: { fontSize: 22, fontWeight: 700 } }, "Lessons"),
+                React.createElement("p", { style: { color: 'var(--text2)', fontSize: 13 } },
+                    store.completedLessons.length,
+                    "/",
+                    LESSONS.length + ARABIC_LESSONS.length,
+                    " completed")),
+            React.createElement("div", { style: { display: 'flex', gap: 8 } },
+                React.createElement("button", { className: `btn btn-sm ${tab === 'english' ? 'btn-primary' : 'btn-secondary'}`, onClick: () => setTab('english') }, "\uD83C\uDF0D English"),
+                React.createElement("button", { className: `btn btn-sm ${tab === 'arabic' ? 'btn-pink' : 'btn-secondary'}`, onClick: () => setTab('arabic') }, "\uD83C\uDF19 Arabic"))),
+        React.createElement("div", { className: "lesson-grid" },
+            tab === 'english' && LESSONS.map(l => renderLesson(l, false)),
+            tab === 'arabic' && ARABIC_LESSONS.map(l => renderLesson(l, true)))));
+}
+// ════════════════════════════════════════════════════════════════
+// PRACTICE SCREEN
+// ════════════════════════════════════════════════════════════════
+function PracticeScreen({ lesson, store, practiceMode, customConfig, onFinish, onBack }) {
+    const settings = store.settings || {};
+    const isArabic = lesson.isArabic || false;
+    const isWeak = practiceMode === 'weak';
+    const isCustom = practiceMode === 'custom';
+    const isBlind = settings.blindMode || false;
+    const isStrict = settings.typingMode === 'strict';
+    const weakKeys = getWeakKeys(store.keyStats);
+    const initText = useMemo(() => {
+        if (isWeak)
+            return generateWeakDrillText(weakKeys);
+        if (isCustom && customConfig)
+            return generateCustomText(customConfig.keys, customConfig.isArabic);
+        return generateText(lesson, weakKeys);
+    }, []);
+    const [text, setText] = useState(initText);
+    const [typed, setTyped] = useState('');
+    const [started, setStarted] = useState(false);
+    const [startTime, setStartTime] = useState(null);
+    const [elapsed, setElapsed] = useState(0);
+    const [keyStats, setKeyStats] = useState({});
+    const [lastError, setLastError] = useState(false);
+    const [showKeyboard, setShowKeyboard] = useState(settings.showKeyboard || false);
+    const [paused, setPaused] = useState(false);
+    const [totalKeystrokes, setTotalKeystrokes] = useState(0);
+    const [correctStrokes, setCorrectStrokes] = useState(0);
+    const inputRef = useRef();
+    const timerRef = useRef();
+    const typedRef = useRef('');
+    const textRef = useRef(text);
+    const pausedRef = useRef(false);
+    const finishedRef = useRef(false);
+    const duration = ((customConfig === null || customConfig === void 0 ? void 0 : customConfig.duration) || settings.sessionDuration || 10) * 60;
+    useEffect(() => { textRef.current = text; }, [text]);
+    useEffect(() => { typedRef.current = typed; }, [typed]);
+    useEffect(() => { pausedRef.current = paused; }, [paused]);
+    useEffect(() => {
+        if (inputRef.current)
+            inputRef.current.focus();
+    }, []);
+    useEffect(() => {
+        if (started && !timerRef.current) {
+            timerRef.current = setInterval(() => {
+                if (!pausedRef.current) {
+                    setElapsed(e => {
+                        const ne = e + 1;
+                        if (ne >= duration && !finishedRef.current) {
+                            finishedRef.current = true;
+                            clearInterval(timerRef.current);
+                            timerRef.current = null;
+                        }
+                        return ne;
+                    });
+                }
+            }, 1000);
+        }
+        return () => { if (timerRef.current) {
+            clearInterval(timerRef.current);
+            timerRef.current = null;
+        } };
+    }, [started, duration]);
+    useEffect(() => {
+        if (elapsed >= duration && started && !finishedRef.current) {
+            finishedRef.current = true;
+            doFinish();
+        }
+    }, [elapsed]);
+    const doFinish = useCallback(() => {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+        const t = typedRef.current;
+        const tx = textRef.current;
+        let correct = 0;
+        for (let i = 0; i < t.length; i++)
+            if (t[i] === tx[i])
+                correct++;
+        const acc = t.length ? Math.round(correct / t.length * 100) : 100;
+        const mins = Math.max(elapsed, 1) / 60;
+        const grossWpm = Math.round((t.length / 5) / mins);
+        let errs = 0;
+        for (let i = 0; i < t.length; i++)
+            if (t[i] !== tx[i])
+                errs++;
+        const netWpm = Math.max(0, Math.round(grossWpm - (errs / mins)));
+        onFinish({ accuracy: acc, wpm: grossWpm, netWpm, grossWpm, errors: errs, duration: elapsed, keyStats });
+    }, [elapsed, keyStats, onFinish]);
+    const grossWpm = useMemo(() => {
+        if (!startTime || !typed.length)
+            return 0;
+        const mins = (Date.now() - startTime) / 60000;
+        return Math.round((typed.length / 5) / Math.max(mins, 0.01));
+    }, [typed, startTime]);
+    const accuracy = useMemo(() => {
+        if (!typed.length)
+            return 100;
+        let c = 0;
+        for (let i = 0; i < typed.length; i++)
+            if (typed[i] === text[i])
+                c++;
+        return Math.round(c / typed.length * 100);
+    }, [typed, text]);
+    const errors = useMemo(() => {
+        let e = 0;
+        for (let i = 0; i < typed.length; i++)
+            if (typed[i] !== text[i])
+                e++;
+        return e;
+    }, [typed, text]);
+    const netWpm = useMemo(() => {
+        if (!startTime || !typed.length)
+            return 0;
+        const mins = (Date.now() - startTime) / 60000;
+        return Math.max(0, Math.round(grossWpm - (errors / Math.max(mins, 0.01))));
+    }, [grossWpm, errors, startTime]);
+    const handleKey = useCallback((e) => {
+        if (e.key === 'Escape') {
+            onBack();
+            return;
+        }
+        if (e.key === 'F9') {
+            setPaused(p => !p);
+            return;
+        }
+        if (pausedRef.current)
+            return;
+        if (e.metaKey || e.ctrlKey)
+            return;
+        if (e.key.length !== 1 && e.key !== 'Backspace')
+            return;
+        e.preventDefault();
+        if (!started) {
+            setStarted(true);
+            setStartTime(Date.now());
+        }
+        if (e.key === 'Backspace') {
+            setTyped(t => t.slice(0, -1));
+            setLastError(false);
+            return;
+        }
+        const ch = e.key;
+        setTyped(prev => {
+            const expected = textRef.current[prev.length] || '';
+            const correct = ch === expected;
+            // Strict mode: block wrong characters
+            if (isStrict && !correct)
+                return prev;
+            setTotalKeystrokes(k => k + 1);
+            if (correct)
+                setCorrectStrokes(k => k + 1);
+            setKeyStats(ks => {
+                const k = expected.toLowerCase();
+                const cur = ks[k] || { total: 0, errors: 0 };
+                return Object.assign(Object.assign({}, ks), { [k]: { total: cur.total + 1, errors: cur.errors + (correct ? 0 : 1) } });
+            });
+            setLastError(!correct);
+            const next = prev + ch;
+            if (next.length >= textRef.current.length) {
+                setTimeout(() => {
+                    const nt = isWeak ? generateWeakDrillText(weakKeys) : isCustom ? generateCustomText((customConfig === null || customConfig === void 0 ? void 0 : customConfig.keys) || '', (customConfig === null || customConfig === void 0 ? void 0 : customConfig.isArabic) || false) : generateText(lesson, weakKeys);
+                    setText(nt);
+                    setTyped('');
+                    setLastError(false);
+                }, 200);
+            }
+            return next;
+        });
+    }, [text, started, lesson, isStrict, isWeak, isCustom, customConfig, weakKeys, onBack]);
+    useEffect(() => {
+        window.addEventListener('keydown', handleKey);
+        return () => window.removeEventListener('keydown', handleKey);
+    }, [handleKey]);
+    const timeLeft = Math.max(0, duration - elapsed);
+    const timerPct = Math.min((elapsed / duration) * 100, 100);
+    const expectedChar = text[typed.length] || '';
+    return (React.createElement("div", { className: "page fade-in" },
+        React.createElement("div", { className: "practice-header" },
+            React.createElement("button", { className: "btn btn-secondary btn-sm", onClick: onBack }, "\u2190 Back"),
+            React.createElement("div", { className: "practice-stats" },
+                React.createElement("div", { className: "stat-pill sp-acc" },
+                    React.createElement("div", null,
+                        React.createElement("div", { className: "sp-label" }, "Accuracy"),
+                        React.createElement("div", { className: "sp-val" },
+                            accuracy,
+                            "%"))),
+                React.createElement("div", { className: "stat-pill sp-wpm" },
+                    React.createElement("div", null,
+                        React.createElement("div", { className: "sp-label" }, "Gross WPM"),
+                        React.createElement("div", { className: "sp-val" }, grossWpm))),
+                React.createElement("div", { className: "stat-pill sp-net" },
+                    React.createElement("div", null,
+                        React.createElement("div", { className: "sp-label" }, "Net WPM"),
+                        React.createElement("div", { className: "sp-val" }, netWpm))),
+                React.createElement("div", { className: "stat-pill sp-timer" },
+                    React.createElement("div", null,
+                        React.createElement("div", { className: "sp-label" }, "Time Left"),
+                        React.createElement("div", { className: "sp-val" }, fmtTime(timeLeft)))),
+                React.createElement("div", { className: "stat-pill sp-err" },
+                    React.createElement("div", null,
+                        React.createElement("div", { className: "sp-label" }, "Errors"),
+                        React.createElement("div", { className: "sp-val" }, errors)))),
+            React.createElement("button", { className: "btn btn-primary btn-sm", onClick: doFinish }, "Finish")),
+        React.createElement("div", { style: { background: 'var(--surface2)', borderRadius: 'var(--r)', height: 4, marginBottom: 16, overflow: 'hidden' } },
+            React.createElement("div", { style: { height: '100%', background: 'var(--accent)', borderRadius: 'var(--r)', width: `${timerPct}%`, transition: 'width 1s linear' } })),
+        paused && React.createElement("div", { className: "focus-banner paused" },
+            React.createElement("span", { style: { fontSize: 18 } }, "\u23F8"),
+            React.createElement("span", null, "Session paused \u2014 press F9 or click Resume to continue"),
+            React.createElement("button", { className: "btn btn-sm btn-secondary", style: { marginLeft: 'auto' }, onClick: () => setPaused(false) }, "Resume \u2192")),
+        !paused && isBlind && React.createElement("div", { className: "focus-banner blind" },
+            React.createElement("span", { style: { fontSize: 18 } }, "\uD83D\uDE48"),
+            React.createElement("span", null, "Blind Mode \u2014 your typing is hidden to build pure muscle memory")),
+        !paused && isStrict && React.createElement("div", { className: "focus-banner strict" },
+            React.createElement("span", { style: { fontSize: 18 } }, "\uD83D\uDD12"),
+            React.createElement("span", null, "Strict Mode \u2014 you must type the correct key before advancing")),
+        !paused && isWeak && React.createElement("div", { className: "focus-banner weak" },
+            React.createElement("span", { style: { fontSize: 18 } }, "\uD83D\uDCAA"),
+            React.createElement("span", null,
+                "Weak Key Drill \u2014 targeting your most error-prone keys: ",
+                React.createElement("strong", null, weakKeys.join(', ')))),
+        !paused && !isBlind && !isStrict && !isWeak && React.createElement("div", { className: "focus-banner eyes" },
+            React.createElement("span", { style: { fontSize: 18 } }, "\uD83D\uDC41"),
+            React.createElement("span", null, "Keep your eyes on the screen \u2014 do not look at the keyboard!")),
+        React.createElement("div", { className: "lesson-focus" },
+            isWeak ? React.createElement("span", null,
+                "Targeting: ",
+                React.createElement("strong", null, lesson.keys)) : React.createElement("span", null,
+                "Lesson: ",
+                React.createElement("strong", null, lesson.name),
+                " \u00B7 ",
+                lesson.desc),
+            React.createElement("span", { style: { marginLeft: 'auto', display: 'flex', gap: 6 } },
+                isBlind && React.createElement("span", { className: "badge badge-blue", style: { fontSize: 11, padding: '2px 8px' } }, "\uD83D\uDE48 Blind"),
+                isStrict && React.createElement("span", { className: "badge", style: { fontSize: 11, padding: '2px 8px', background: 'var(--red-bg)', color: 'var(--red)', border: '1px solid rgba(255,92,92,0.3)' } }, "\uD83D\uDD12 Strict"),
+                isArabic && React.createElement("span", { className: "badge", style: { fontSize: 11, padding: '2px 8px', background: 'var(--pink-bg)', color: 'var(--pink)', border: '1px solid rgba(248,124,190,0.3)' } }, "\uD83C\uDF19 Arabic"))),
+        React.createElement("div", { className: "typing-area", style: { position: 'relative' }, onClick: () => { var _a; (_a = inputRef.current) === null || _a === void 0 ? void 0 : _a.focus(); if (paused)
+                setPaused(false); } },
+            React.createElement("input", { ref: inputRef, style: { position: 'absolute', opacity: 0, width: 0, height: 0 }, readOnly: true, tabIndex: -1 }),
+            !started && React.createElement("div", { style: { color: 'var(--text3)', fontSize: 13, marginBottom: 12, textAlign: 'center' } }, "Click and start typing to begin"),
+            paused && React.createElement("div", { className: "pause-overlay" },
+                React.createElement("h2", null, "\u23F8 Paused"),
+                React.createElement("p", null, "Click anywhere or press F9 to resume")),
+            React.createElement("div", { className: `typing-display${isArabic ? ' arabic-display' : ''}${lastError && !isStrict ? ' shake' : ''}`, dir: isArabic ? 'rtl' : 'ltr' }, text.split('').map((ch, i) => {
+                let cls = 'char pending';
+                if (i < typed.length) {
+                    cls = 'char ' + (typed[i] === ch ? 'correct' : 'error');
+                    if (isBlind)
+                        cls += ' blind';
+                }
+                if (i === typed.length) {
+                    cls = 'char current';
+                    if (isBlind)
+                        cls += ' blind';
+                }
+                return React.createElement("span", { key: i, className: cls }, ch);
+            }))),
+        React.createElement("div", { style: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10, flexWrap: 'wrap', gap: 8 } },
+            React.createElement(FingerGuide, { targetKey: expectedChar, isArabic: isArabic }),
+            React.createElement("div", { style: { display: 'flex', gap: 6 } },
+                React.createElement("button", { className: "btn btn-secondary btn-sm", onClick: () => setPaused(p => !p) }, paused ? '▶ Resume' : '⏸ Pause'),
+                React.createElement("button", { className: "btn btn-secondary btn-sm", onClick: () => setShowKeyboard(v => !v) }, showKeyboard ? 'Hide Keys' : 'Show Keys'))),
+        showKeyboard && !isArabic && React.createElement(KeyboardViz, { activeKey: expectedChar, errorKey: lastError && !isStrict ? expectedChar : null, keyStats: keyStats }),
+        !showKeyboard && React.createElement("div", { style: { textAlign: 'center', padding: 14, color: 'var(--text3)', fontSize: 13 } }, "\uD83D\uDCAA Keyboard hidden \u2014 trust your muscle memory! (F9 = pause)"),
+        React.createElement("div", { style: { display: 'flex', gap: 10, justifyContent: 'center', marginTop: 14, flexWrap: 'wrap' } },
+            React.createElement("button", { className: "btn btn-secondary", onClick: () => { setTyped(''); setLastError(false); finishedRef.current = false; } }, "\u21BA Restart Text"),
+            React.createElement("button", { className: "btn btn-primary", onClick: doFinish }, "Finish Session \u2192"))));
+}
+// ════════════════════════════════════════════════════════════════
+// FINGER GUIDE
+// ════════════════════════════════════════════════════════════════
+function FingerGuide({ targetKey, isArabic }) {
+    if (isArabic)
+        return React.createElement("div", { style: { fontSize: 12, color: 'var(--text2)' } }, "\uD83C\uDF19 Arabic mode \u2014 focus on accuracy over speed");
+    if (!targetKey || targetKey === ' ')
+        return (React.createElement("div", { style: { fontSize: 12, color: 'var(--text2)', display: 'flex', alignItems: 'center', gap: 6 } },
+            React.createElement("span", { style: { display: 'inline-block', width: 36, height: 14, border: '2px solid var(--border2)', borderRadius: 3, background: 'var(--surface2)' } }),
+            "Space \u2014 both thumbs"));
+    const finger = FINGER_MAP[targetKey.toLowerCase()];
+    if (!finger)
+        return null;
+    const color = FINGER_COLORS[finger] || 'var(--accent)';
+    const fingerNames = { 'left-pinky': 'Left Pinky', 'left-ring': 'Left Ring', 'left-middle': 'Left Middle', 'left-index': 'Left Index', 'right-index': 'Right Index', 'right-middle': 'Right Middle', 'right-ring': 'Right Ring', 'right-pinky': 'Right Pinky' };
+    return (React.createElement("div", { style: { display: 'flex', alignItems: 'center', gap: 7, fontSize: 12 } },
+        React.createElement("span", { style: { width: 10, height: 10, borderRadius: '50%', background: color, flexShrink: 0, display: 'inline-block' } }),
+        React.createElement("span", { style: { color: 'var(--text2)' } },
+            "Key ",
+            React.createElement("strong", { style: { color: 'var(--text)', fontFamily: 'JetBrains Mono' } }, targetKey),
+            " \u2192 ",
+            fingerNames[finger] || finger)));
+}
+// ════════════════════════════════════════════════════════════════
+// KEYBOARD VIZ
+// ════════════════════════════════════════════════════════════════
+function KeyboardViz({ activeKey, errorKey, keyStats }) {
+    const ak = (activeKey || '').toLowerCase();
+    return (React.createElement("div", { className: "keyboard-wrap fade-in" },
+        KEYBOARD_LAYOUT.map((row, ri) => (React.createElement("div", { key: ri, className: "keyboard-row", style: { paddingLeft: [0, 20, 38][ri] } }, row.map(k => {
+            const isActive = ak === k;
+            const isError = errorKey && (errorKey.toLowerCase() === k);
+            const stat = keyStats === null || keyStats === void 0 ? void 0 : keyStats[k];
+            const errRate = stat && stat.total > 0 ? stat.errors / stat.total : 0;
+            const fingerColor = FINGER_COLORS[FINGER_MAP[k]] || '#888';
+            return (React.createElement("div", { key: k, className: `key${isActive ? ' active-key' : ''}${isError ? ' error-key' : ''}` },
+                k,
+                React.createElement("span", { className: "finger-dot", style: { background: fingerColor, opacity: 0.7 } }),
+                errRate > 0.2 && React.createElement("span", { style: { position: 'absolute', top: -2, right: -2, width: 5, height: 5, borderRadius: '50%', background: 'var(--red)' } })));
+        })))),
+        React.createElement("div", { className: "keyboard-row" },
+            React.createElement("div", { className: "key space-key", style: { fontFamily: 'DM Sans', fontSize: 10, color: 'var(--text3)' } }, "SPACE")),
+        React.createElement("div", { className: "finger-guide" }, Object.entries(FINGER_COLORS).map(([f, c]) => (React.createElement("div", { key: f, className: "finger-chip" },
+            React.createElement("span", { className: "finger-dot-lg", style: { background: c } }),
+            React.createElement("span", { style: { fontSize: 10 } }, f.replace('-', ' '))))))));
+}
+// ════════════════════════════════════════════════════════════════
+// RESULT SCREEN
+// ════════════════════════════════════════════════════════════════
+function ResultScreen({ result, lesson, keyStats, onRetry, onNext, onDash, store }) {
+    const grade = result.accuracy >= 95 ? 'S' : result.accuracy >= 90 ? 'A' : result.accuracy >= 80 ? 'B' : result.accuracy >= 70 ? 'C' : 'D';
+    const gradeColor = { S: 'var(--green)', A: 'var(--accent)', B: 'var(--blue)', C: 'var(--amber)', D: 'var(--red)' }[grade];
+    const nextLesson = LESSONS.find(l => l.id === lesson.id + 1 && store.unlockedLessons.includes(l.id));
+    const coachTips = useMemo(() => generateCoachFeedback(result, store.keyStats), [result, store.keyStats]);
+    return (React.createElement("div", { className: "page fade-in" },
+        React.createElement("div", { className: "result-card" },
+            React.createElement("div", { style: { marginBottom: 6, color: 'var(--text2)', fontSize: 13 } }, "Session Complete!"),
+            React.createElement("div", { className: "result-score", style: { color: gradeColor } }, grade),
+            React.createElement("div", { className: "result-grade", style: { color: gradeColor } }, grade === 'S' ? 'Perfect!' : grade === 'A' ? 'Excellent!' : grade === 'B' ? 'Good Job!' : grade === 'C' ? 'Keep Practicing!' : 'Needs Work'),
+            React.createElement("div", { className: "result-stats" },
+                React.createElement("div", { className: "result-stat" },
+                    React.createElement("div", { className: "rs-val", style: { color: 'var(--green)' } },
+                        Math.round(result.accuracy),
+                        "%"),
+                    React.createElement("div", { className: "rs-label" }, "Accuracy")),
+                React.createElement("div", { className: "result-stat" },
+                    React.createElement("div", { className: "rs-val", style: { color: 'var(--accent)' } }, Math.round(result.grossWpm || result.wpm)),
+                    React.createElement("div", { className: "rs-label" }, "Gross WPM")),
+                React.createElement("div", { className: "result-stat" },
+                    React.createElement("div", { className: "rs-val", style: { color: 'var(--blue)' } }, Math.round(result.netWpm || result.wpm)),
+                    React.createElement("div", { className: "rs-label" }, "Net WPM")),
+                React.createElement("div", { className: "result-stat" },
+                    React.createElement("div", { className: "rs-val", style: { color: 'var(--red)' } }, result.errors),
+                    React.createElement("div", { className: "rs-label" }, "Errors")),
+                React.createElement("div", { className: "result-stat" },
+                    React.createElement("div", { className: "rs-val", style: { color: 'var(--amber)' } }, fmtTime(result.duration || 0)),
+                    React.createElement("div", { className: "rs-label" }, "Time"))),
+            React.createElement("div", { style: { display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap' } },
+                React.createElement("span", { className: "badge badge-gold" },
+                    "\u26A1 +",
+                    result.xpGained || 0,
+                    " XP"),
+                result.accuracy >= 90 && React.createElement("span", { className: "badge badge-gold" }, "\uD83C\uDFC6 Accuracy Master"),
+                (result.grossWpm || result.wpm) >= 40 && React.createElement("span", { className: "badge badge-green" }, "\uD83D\uDE80 Speed Demon"),
+                result.errors === 0 && result.duration > 30 && React.createElement("span", { className: "badge badge-gold" }, "\uD83D\uDC8E Perfect Round"),
+                result.blindMode && React.createElement("span", { className: "badge badge-blue" }, "\uD83D\uDE48 Blind Mode"))),
+        React.createElement("div", { className: "coach-card" },
+            React.createElement("div", { className: "section-title" }, "\uD83E\uDD16 Coach Feedback"),
+            coachTips.map((tip, i) => (React.createElement("div", { key: i, className: "coach-tip" },
+                React.createElement("span", { style: { fontSize: 13, color: 'var(--text)', lineHeight: 1.5 } }, tip))))),
+        Object.keys(result.keyStats || {}).length > 0 && (React.createElement("div", { style: { background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--r2)', padding: 18, marginBottom: 14 } },
+            React.createElement("div", { className: "section-title" }, "Key Performance This Session"),
+            React.createElement("div", { style: { display: 'flex', flexWrap: 'wrap', gap: 8 } }, Object.entries(result.keyStats).sort(([, a], [, b]) => (b.errors / b.total) - (a.errors / a.total)).map(([k, v]) => {
+                const rate = v.total > 0 ? v.errors / v.total : 0;
+                const bg = rate > 0.3 ? 'var(--red-bg)' : rate > 0.1 ? 'var(--amber-bg)' : 'var(--green-bg)';
+                const col = rate > 0.3 ? 'var(--red)' : rate > 0.1 ? 'var(--amber)' : 'var(--green)';
+                return (React.createElement("div", { key: k, style: { background: bg, border: `1px solid ${col}44`, borderRadius: 7, padding: '7px 12px', textAlign: 'center' } },
+                    React.createElement("div", { style: { fontFamily: 'JetBrains Mono', fontSize: 18, fontWeight: 700, color: col } }, k),
+                    React.createElement("div", { style: { fontSize: 10, color: 'var(--text2)' } },
+                        v.total > 0 ? Math.round((1 - rate) * 100) : 100,
+                        "%")));
+            })))),
+        React.createElement("div", { style: { display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap' } },
+            React.createElement("button", { className: "btn btn-secondary", onClick: onDash }, "Dashboard"),
+            React.createElement("button", { className: "btn btn-secondary", onClick: onRetry }, "\u21BA Retry"),
+            nextLesson && React.createElement("button", { className: "btn btn-primary", onClick: onNext },
+                "Next: ",
+                nextLesson.name,
+                " \u2192"))));
+}
+// ════════════════════════════════════════════════════════════════
+// CUSTOM PRACTICE PAGE
+// ════════════════════════════════════════════════════════════════
+function CustomPage({ onStart, store }) {
+    const [keys, setKeys] = useState('');
+    const [duration, setDuration] = useState(5);
+    const [isArabic, setIsArabic] = useState(false);
+    const [preview, setPreview] = useState('');
+    useEffect(() => {
+        if (keys.trim())
+            setPreview(generateCustomText(keys, isArabic).slice(0, 80) + '...');
+        else
+            setPreview('');
+    }, [keys, isArabic]);
+    const handleStart = () => {
+        if (!keys.trim()) {
+            alert('Please enter keys or text to practice.');
+            return;
+        }
+        onStart({ keys, duration, isArabic });
+    };
+    return (React.createElement("div", { className: "page fade-in", style: { maxWidth: 600 } },
+        React.createElement("h2", { style: { fontSize: 22, fontWeight: 700, marginBottom: 8 } }, "Custom Practice Builder"),
+        React.createElement("p", { style: { color: 'var(--text2)', fontSize: 14, marginBottom: 24 } }, "Design your own drill around specific keys or text you want to master."),
+        React.createElement("div", { style: { display: 'flex', flexDirection: 'column', gap: 4, marginBottom: 20 } },
+            React.createElement("div", { style: { background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--r)', padding: '16px 18px' } },
+                React.createElement("div", { style: { fontWeight: 500, fontSize: 14, marginBottom: 8 } }, "Keys or characters to practice"),
+                React.createElement("input", { className: "custom-keys-input", placeholder: "e.g. asdfjkl; or type a phrase", value: keys, onChange: e => setKeys(e.target.value) }),
+                React.createElement("p", { style: { fontSize: 12, color: 'var(--text3)', marginTop: 6 } }, "Enter letters, numbers, or paste a phrase. Drills will be generated around these characters.")),
+            React.createElement("div", { style: { background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--r)', padding: '16px 18px' } },
+                React.createElement("div", { style: { fontWeight: 500, fontSize: 14, marginBottom: 8 } }, "Session Duration"),
+                React.createElement("div", { style: { display: 'flex', gap: 8, flexWrap: 'wrap' } }, [2, 5, 10, 15].map(m => (React.createElement("button", { key: m, className: `btn btn-sm ${duration === m ? 'btn-primary' : 'btn-secondary'}`, onClick: () => setDuration(m) },
+                    m,
+                    " min"))))),
+            React.createElement("div", { style: { background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--r)', padding: '16px 18px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' } },
+                React.createElement("div", null,
+                    React.createElement("div", { style: { fontWeight: 500, fontSize: 14 } }, "Arabic Mode"),
+                    React.createElement("div", { style: { fontSize: 12, color: 'var(--text2)', marginTop: 2 } }, "Switch to Arabic RTL typing")),
+                React.createElement(Toggle, { val: isArabic, onChange: setIsArabic })),
+            preview && (React.createElement("div", { style: { background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--r)', padding: '14px 18px' } },
+                React.createElement("div", { style: { fontSize: 12, color: 'var(--text3)', marginBottom: 6 } }, "Preview drill text:"),
+                React.createElement("div", { style: { fontFamily: 'JetBrains Mono', fontSize: 14, color: 'var(--text2)', lineHeight: 1.6, direction: isArabic ? 'rtl' : 'ltr' } }, preview)))),
+        React.createElement("button", { className: "btn btn-primary", style: { width: '100%', justifyContent: 'center' }, onClick: handleStart }, "Start Custom Drill \u2192"),
+        getWeakKeys(store.keyStats).length > 0 && (React.createElement("div", { style: { marginTop: 20, background: 'var(--pink-bg)', border: '1px solid rgba(248,124,190,0.3)', borderRadius: 'var(--r)', padding: 16 } },
+            React.createElement("div", { style: { fontWeight: 500, fontSize: 14, color: 'var(--pink)', marginBottom: 6 } }, "\uD83D\uDCA1 Quick: Weak Key Auto-Fill"),
+            React.createElement("p", { style: { fontSize: 12, color: 'var(--text2)', marginBottom: 10 } },
+                "Your weakest keys are: ",
+                React.createElement("strong", { style: { fontFamily: 'JetBrains Mono' } }, getWeakKeys(store.keyStats).join(' '))),
+            React.createElement("button", { className: "btn btn-pink btn-sm", onClick: () => setKeys(getWeakKeys(store.keyStats).join('')) }, "Use My Weak Keys")))));
+}
+// ════════════════════════════════════════════════════════════════
+// ANALYTICS PAGE
+// ════════════════════════════════════════════════════════════════
+function AnalyticsPage({ store }) {
+    const [tab, setTab] = useState('overview');
+    const sessions = store.sessions || [];
+    const last14 = sessions.slice(-14);
+    const keyStats = store.keyStats || {};
+    const totalMinutes = Math.floor((store.totalTime || 0) / 60);
+    const worstKeys = Object.entries(keyStats).filter(([, v]) => v.total >= 3).sort(([, a], [, b]) => (b.errors / b.total) - (a.errors / a.total)).slice(0, 10);
+    const bestKeys = Object.entries(keyStats).filter(([, v]) => v.total >= 5).sort(([, a], [, b]) => (a.errors / a.total) - (b.errors / b.total)).slice(0, 10);
+    return (React.createElement("div", { className: "page-wide fade-in" },
+        React.createElement("div", { style: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20, flexWrap: 'wrap', gap: 10 } },
+            React.createElement("h2", { style: { fontSize: 22, fontWeight: 700 } }, "Analytics"),
+            React.createElement("div", { style: { display: 'flex', gap: 8 } },
+                React.createElement("button", { className: "btn btn-secondary btn-sm", onClick: () => exportJSON(store) }, "\u2B07 Export JSON"),
+                React.createElement("button", { className: "btn btn-secondary btn-sm", onClick: () => exportCSV(store.sessions) }, "\u2B07 Export CSV"))),
+        React.createElement("div", { className: "page-tabs" }, ['overview', 'keys', 'history'].map(t => (React.createElement("button", { key: t, className: `page-tab${tab === t ? ' active' : ''}`, onClick: () => setTab(t) }, t.charAt(0).toUpperCase() + t.slice(1))))),
+        tab === 'overview' && (React.createElement("div", null,
+            React.createElement("div", { className: "stat-grid" },
+                React.createElement("div", { className: "stat-card green" },
+                    React.createElement("div", { className: "label" }, "Total Sessions"),
+                    React.createElement("div", { className: "value" }, sessions.length)),
+                React.createElement("div", { className: "stat-card accent" },
+                    React.createElement("div", { className: "label" }, "Practice Time"),
+                    React.createElement("div", { className: "value" },
+                        totalMinutes,
+                        "m")),
+                React.createElement("div", { className: "stat-card amber" },
+                    React.createElement("div", { className: "label" }, "Best Accuracy"),
+                    React.createElement("div", { className: "value" },
+                        sessions.length ? Math.max(...sessions.map(s => Math.round(s.accuracy))) : '—',
+                        "%")),
+                React.createElement("div", { className: "stat-card" },
+                    React.createElement("div", { className: "label" }, "Best Net WPM"),
+                    React.createElement("div", { className: "value" }, sessions.length ? Math.max(...sessions.map(s => Math.round(s.netWpm || s.wpm || 0))) : '—')),
+                React.createElement("div", { className: "stat-card" },
+                    React.createElement("div", { className: "label" }, "Best Gross WPM"),
+                    React.createElement("div", { className: "value" }, sessions.length ? Math.max(...sessions.map(s => Math.round(s.grossWpm || s.wpm || 0))) : '—')),
+                React.createElement("div", { className: "stat-card" },
+                    React.createElement("div", { className: "label" }, "Streak"),
+                    React.createElement("div", { className: "value" },
+                        "\uD83D\uDD25 ",
+                        store.streak))),
+            last14.length > 0 && (React.createElement(React.Fragment, null,
+                React.createElement("div", { style: { background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--r2)', padding: 20, marginBottom: 14 } },
+                    React.createElement("div", { className: "section-title" }, "Last 14 Sessions \u2014 Accuracy"),
+                    React.createElement("div", { className: "chart-area" },
+                        React.createElement("div", { className: "chart-bars" }, last14.map((s, i) => {
+                            const acc = Math.round(s.accuracy);
+                            const col = acc >= 90 ? 'var(--green)' : acc >= 70 ? 'var(--accent)' : 'var(--red)';
+                            return React.createElement("div", { key: i, className: "chart-bar", style: { height: `${acc}%`, background: col, opacity: 0.85 }, "data-tip": `${acc}% · ${Math.round(s.wpm)} wpm` });
+                        }))),
+                    React.createElement("div", { style: { display: 'flex', gap: 3, marginTop: 4 } }, last14.map((s, i) => React.createElement("div", { key: i, style: { flex: 1, textAlign: 'center', fontSize: 9, color: 'var(--text3)' } }, new Date(s.date).toLocaleDateString(undefined, { weekday: 'short' }))))),
+                React.createElement("div", { style: { background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--r2)', padding: 20, marginBottom: 14 } },
+                    React.createElement("div", { className: "section-title" }, "Last 14 Sessions \u2014 WPM (Net)"),
+                    React.createElement("div", { className: "chart-area" },
+                        React.createElement("div", { className: "chart-bars" }, (() => {
+                            const maxW = Math.max(...last14.map(s => s.netWpm || s.wpm || 1));
+                            return last14.map((s, i) => {
+                                const w = s.netWpm || s.wpm || 0;
+                                const pct = Math.round((w / maxW) * 100);
+                                return React.createElement("div", { key: i, className: "chart-bar", style: { height: `${pct}%`, background: 'var(--accent)', opacity: 0.8 }, "data-tip": `${Math.round(w)} net wpm` });
+                            });
+                        })()))))))),
+        tab === 'keys' && (React.createElement("div", { style: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 } },
+            React.createElement("div", { style: { background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--r2)', padding: 18 } },
+                React.createElement("div", { className: "section-title", style: { color: 'var(--red)' } }, "\u26A0 Weakest Keys"),
+                worstKeys.length === 0 ? React.createElement("p", { style: { color: 'var(--text3)', fontSize: 13 } }, "Not enough data yet")
+                    : worstKeys.map(([k, v]) => {
+                        const rate = Math.round(v.errors / v.total * 100);
+                        return (React.createElement("div", { key: k, style: { display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 } },
+                            React.createElement("span", { style: { fontFamily: 'JetBrains Mono', fontSize: 18, fontWeight: 700, width: 20, color: 'var(--red)' } }, k),
+                            React.createElement("div", { style: { flex: 1 } },
+                                React.createElement("div", { style: { display: 'flex', justifyContent: 'space-between', fontSize: 11, color: 'var(--text2)', marginBottom: 3 } },
+                                    React.createElement("span", null,
+                                        v.errors,
+                                        " errors / ",
+                                        v.total),
+                                    React.createElement("span", { style: { color: 'var(--red)' } },
+                                        rate,
+                                        "%")),
+                                React.createElement("div", { className: "progress-bar" },
+                                    React.createElement("div", { className: "progress-fill red", style: { width: `${Math.min(rate * 2, 100)}%` } })))));
+                    })),
+            React.createElement("div", { style: { background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--r2)', padding: 18 } },
+                React.createElement("div", { className: "section-title", style: { color: 'var(--green)' } }, "\u2713 Strongest Keys"),
+                bestKeys.length === 0 ? React.createElement("p", { style: { color: 'var(--text3)', fontSize: 13 } }, "Not enough data yet")
+                    : bestKeys.map(([k, v]) => {
+                        const rate = Math.round((1 - v.errors / v.total) * 100);
+                        return (React.createElement("div", { key: k, style: { display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 } },
+                            React.createElement("span", { style: { fontFamily: 'JetBrains Mono', fontSize: 18, fontWeight: 700, width: 20, color: 'var(--green)' } }, k),
+                            React.createElement("div", { style: { flex: 1 } },
+                                React.createElement("div", { style: { display: 'flex', justifyContent: 'space-between', fontSize: 11, color: 'var(--text2)', marginBottom: 3 } },
+                                    React.createElement("span", null,
+                                        v.total,
+                                        " typed"),
+                                    React.createElement("span", { style: { color: 'var(--green)' } },
+                                        rate,
+                                        "%")),
+                                React.createElement("div", { className: "progress-bar" },
+                                    React.createElement("div", { className: "progress-fill green", style: { width: `${rate}%` } })))));
+                    })),
+            React.createElement("div", { style: { gridColumn: '1/-1', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--r2)', padding: 18 } },
+                React.createElement("div", { className: "section-title" }, "Keyboard Heatmap"),
+                React.createElement(HeatmapKeyboard, { keyStats: keyStats })))),
+        tab === 'history' && (React.createElement("div", { style: { display: 'flex', flexDirection: 'column', gap: 8 } },
+            sessions.length === 0 && React.createElement("div", { style: { textAlign: 'center', padding: 60, color: 'var(--text3)' } }, "No sessions yet"),
+            [...sessions].reverse().map((s, i) => {
+                const l = LESSONS.find(l => l.id === s.lessonId) || ARABIC_LESSONS.find(l => l.id === s.lessonId) || { name: s.mode === 'weak' ? 'Weak Key Drill' : s.mode === 'custom' ? 'Custom Drill' : s.lessonId || '?' };
+                return (React.createElement("div", { key: i, style: { background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--r)', padding: '12px 16px', display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' } },
+                    React.createElement("div", { style: { flex: 1, minWidth: 120 } },
+                        React.createElement("div", { style: { fontWeight: 600, fontSize: 13, display: 'flex', gap: 6, alignItems: 'center' } },
+                            l.name,
+                            s.blindMode && React.createElement("span", { className: "badge badge-blue", style: { padding: '1px 6px', fontSize: 9 } }, "blind"),
+                            s.isArabic && React.createElement("span", { style: { fontSize: 10, color: 'var(--pink)' } }, "\u0639\u0631\u0628\u064A")),
+                        React.createElement("div", { style: { fontSize: 11, color: 'var(--text3)' } }, new Date(s.date).toLocaleString())),
+                    React.createElement("div", { style: { textAlign: 'center' } },
+                        React.createElement("div", { style: { fontFamily: 'JetBrains Mono', fontWeight: 700, fontSize: 16, color: s.accuracy >= 90 ? 'var(--green)' : s.accuracy >= 70 ? 'var(--amber)' : 'var(--red)' } },
+                            Math.round(s.accuracy),
+                            "%"),
+                        React.createElement("div", { style: { fontSize: 10, color: 'var(--text3)' } }, "acc")),
+                    React.createElement("div", { style: { textAlign: 'center' } },
+                        React.createElement("div", { style: { fontFamily: 'JetBrains Mono', fontWeight: 700, fontSize: 16, color: 'var(--accent)' } }, Math.round(s.grossWpm || s.wpm)),
+                        React.createElement("div", { style: { fontSize: 10, color: 'var(--text3)' } }, "gross")),
+                    React.createElement("div", { style: { textAlign: 'center' } },
+                        React.createElement("div", { style: { fontFamily: 'JetBrains Mono', fontWeight: 700, fontSize: 16, color: 'var(--blue)' } }, Math.round(s.netWpm || s.wpm)),
+                        React.createElement("div", { style: { fontSize: 10, color: 'var(--text3)' } }, "net")),
+                    React.createElement("div", { style: { textAlign: 'center' } },
+                        React.createElement("div", { style: { fontFamily: 'JetBrains Mono', fontWeight: 700, fontSize: 16 } }, fmtTime(s.duration || 0)),
+                        React.createElement("div", { style: { fontSize: 10, color: 'var(--text3)' } }, "time")),
+                    React.createElement("div", { style: { textAlign: 'center' } },
+                        React.createElement("div", { style: { fontWeight: 700, color: 'var(--accent)', fontSize: 13 } },
+                            "+",
+                            s.xpGained || 0),
+                        React.createElement("div", { style: { fontSize: 10, color: 'var(--text3)' } }, "XP"))));
+            })))));
+}
+function HeatmapKeyboard({ keyStats }) {
+    return (React.createElement("div", null,
+        KEYBOARD_LAYOUT.map((row, ri) => (React.createElement("div", { key: ri, className: "keyboard-row", style: { paddingLeft: [0, 20, 38][ri] } }, row.map(k => {
+            const stat = keyStats[k];
+            const errRate = stat && stat.total > 0 ? stat.errors / stat.total : 0;
+            const intensity = Math.min(errRate * 3, 1);
+            const r = Math.round(255 * intensity);
+            const g = Math.round(220 * (1 - intensity * 0.8));
+            const bg = stat ? `rgba(${r},${g},60,${0.15 + intensity * 0.6})` : 'var(--surface2)';
+            const textCol = intensity > 0.5 ? 'var(--red)' : intensity > 0.2 ? 'var(--amber)' : stat ? 'var(--green)' : 'var(--text3)';
+            return (React.createElement("div", { key: k, className: "key", style: { background: bg, color: textCol, borderColor: intensity > 0.3 ? 'rgba(255,92,92,0.4)' : 'var(--border2)' } },
+                k,
+                stat && React.createElement("span", { style: { position: 'absolute', bottom: 2, right: 2, fontSize: 8, color: 'inherit' } }, stat.total)));
+        })))),
+        React.createElement("div", { style: { display: 'flex', gap: 8, marginTop: 10, alignItems: 'center', fontSize: 11, color: 'var(--text3)' } },
+            React.createElement("span", null, "\uD83D\uDFE2 Few errors"),
+            React.createElement("span", null, "\uD83D\uDFE1 Some errors"),
+            React.createElement("span", null, "\uD83D\uDD34 Many errors"),
+            React.createElement("span", { style: { marginLeft: 'auto' } }, "Numbers = total keypresses"))));
+}
+// ════════════════════════════════════════════════════════════════
+// ACHIEVEMENTS PAGE
+// ════════════════════════════════════════════════════════════════
+function AchievementsPage({ store }) {
+    const earned = store.achievements || [];
+    const earnedCount = earned.length;
+    return (React.createElement("div", { className: "page fade-in" },
+        React.createElement("h2", { style: { fontSize: 22, fontWeight: 700, marginBottom: 6 } }, "Achievements"),
+        React.createElement("p", { style: { color: 'var(--text2)', fontSize: 14, marginBottom: 20 } },
+            earnedCount,
+            " / ",
+            ACHIEVEMENTS.length,
+            " unlocked"),
+        React.createElement("div", { style: { height: 6, background: 'var(--surface2)', borderRadius: 3, overflow: 'hidden', marginBottom: 24 } },
+            React.createElement("div", { style: { height: '100%', background: 'var(--amber)', borderRadius: 3, width: `${earnedCount / ACHIEVEMENTS.length * 100}%`, transition: 'width 0.4s' } })),
+        React.createElement("div", { className: "ach-grid" }, ACHIEVEMENTS.map(a => {
+            const isEarned = earned.includes(a.id);
+            return (React.createElement("div", { key: a.id, className: `ach-card ${isEarned ? 'earned' : 'locked'}` },
+                React.createElement("div", { className: "ach-icon" }, a.icon),
+                React.createElement("div", { className: "ach-info" },
+                    React.createElement("h4", null, a.name),
+                    React.createElement("p", null, a.desc),
+                    isEarned && React.createElement("span", { style: { fontSize: 10, color: 'var(--amber)', fontWeight: 600, marginTop: 3, display: 'block' } }, "\u2713 Unlocked"))));
+        }))));
+}
+// ════════════════════════════════════════════════════════════════
+// SETTINGS PAGE
+// ════════════════════════════════════════════════════════════════
+function Toggle({ val, onChange }) {
+    return (React.createElement("div", { onClick: () => onChange(!val), style: { width: 44, height: 24, borderRadius: 12, background: val ? 'var(--accent)' : 'var(--surface3)', border: '1px solid var(--border2)', cursor: 'pointer', transition: 'background 0.2s', position: 'relative', flexShrink: 0 } },
+        React.createElement("div", { style: { width: 18, height: 18, borderRadius: '50%', background: '#fff', position: 'absolute', top: 2, left: val ? 22 : 2, transition: 'left 0.2s', boxShadow: '0 1px 4px rgba(0,0,0,0.3)' } })));
+}
+function SettingsPage({ store, updateStore }) {
+    const s = store.settings || {};
+    const g = store.dailyGoals || { sessions: 1, minutes: 10, accuracy: 80 };
+    const set = (k, v) => updateStore(() => ({ settings: Object.assign(Object.assign({}, store.settings), { [k]: v }) }));
+    const setGoal = (k, v) => updateStore(() => ({ dailyGoals: Object.assign(Object.assign({}, store.dailyGoals), { [k]: v }) }));
+    return (React.createElement("div", { className: "page fade-in", style: { maxWidth: 580 } },
+        React.createElement("h2", { style: { fontSize: 22, fontWeight: 700, marginBottom: 24 } }, "Settings"),
+        React.createElement("div", { className: "section-title" }, "Practice"),
+        React.createElement("div", { style: { display: 'flex', flexDirection: 'column', gap: 1, marginBottom: 20 } },
+            React.createElement(SettingRow, { label: "Session Duration", desc: "Default time per practice session" },
+                React.createElement("div", { style: { display: 'flex', gap: 6 } }, [5, 10, 15, 20].map(m => (React.createElement("button", { key: m, className: `btn ${s.sessionDuration === m ? 'btn-primary' : 'btn-secondary'} btn-sm`, onClick: () => set('sessionDuration', m) },
+                    m,
+                    "m"))))),
+            React.createElement(SettingRow, { label: "Typing Mode", desc: "Strict: must type correct key \u00B7 Soft: typos allowed" },
+                React.createElement("div", { style: { display: 'flex', gap: 6 } },
+                    React.createElement("button", { className: `btn btn-sm ${s.typingMode !== 'strict' ? 'btn-primary' : 'btn-secondary'}`, onClick: () => set('typingMode', 'soft') }, "Soft"),
+                    React.createElement("button", { className: `btn btn-sm ${s.typingMode === 'strict' ? 'btn-danger' : 'btn-secondary'}`, onClick: () => set('typingMode', 'strict') }, "Strict \uD83D\uDD12"))),
+            React.createElement(SettingRow, { label: "Blind Mode", desc: "Hides your typed characters to build muscle memory" },
+                React.createElement(Toggle, { val: !!s.blindMode, onChange: v => set('blindMode', v) })),
+            React.createElement(SettingRow, { label: "Show Keyboard by Default", desc: "Show on-screen keyboard when session starts" },
+                React.createElement(Toggle, { val: !!s.showKeyboard, onChange: v => set('showKeyboard', v) })),
+            React.createElement(SettingRow, { label: "Arabic Mode", desc: "Switch to Arabic RTL typing globally" },
+                React.createElement(Toggle, { val: !!s.arabicMode, onChange: v => set('arabicMode', v) }))),
+        React.createElement("div", { className: "section-title" }, "Daily Goals"),
+        React.createElement("div", { style: { display: 'flex', flexDirection: 'column', gap: 1, marginBottom: 20 } },
+            React.createElement(SettingRow, { label: "Sessions per Day", desc: "How many sessions to complete daily" },
+                React.createElement("div", { style: { display: 'flex', gap: 6 } }, [1, 2, 3, 5].map(n => (React.createElement("button", { key: n, className: `btn btn-sm ${g.sessions === n ? 'btn-primary' : 'btn-secondary'}`, onClick: () => setGoal('sessions', n) }, n))))),
+            React.createElement(SettingRow, { label: "Practice Minutes", desc: "Target practice time per day" },
+                React.createElement("div", { style: { display: 'flex', gap: 6 } }, [5, 10, 15, 30].map(m => (React.createElement("button", { key: m, className: `btn btn-sm ${g.minutes === m ? 'btn-primary' : 'btn-secondary'}`, onClick: () => setGoal('minutes', m) },
+                    m,
+                    "m"))))),
+            React.createElement(SettingRow, { label: "Accuracy Goal", desc: "Target accuracy percentage for the day" },
+                React.createElement("div", { style: { display: 'flex', gap: 6 } }, [70, 80, 90, 95].map(a => (React.createElement("button", { key: a, className: `btn btn-sm ${g.accuracy === a ? 'btn-primary' : 'btn-secondary'}`, onClick: () => setGoal('accuracy', a) },
+                    a,
+                    "%")))))),
+        React.createElement("div", { className: "section-title" }, "Appearance"),
+        React.createElement("div", { style: { marginBottom: 20 } },
+            React.createElement(SettingRow, { label: "Theme", desc: "Dark or light mode" },
+                React.createElement("div", { style: { display: 'flex', gap: 6 } },
+                    React.createElement("button", { className: `btn btn-sm ${store.theme === 'dark' ? 'btn-primary' : 'btn-secondary'}`, onClick: () => updateStore(() => ({ theme: 'dark' })) }, "\uD83C\uDF19 Dark"),
+                    React.createElement("button", { className: `btn btn-sm ${store.theme === 'light' ? 'btn-primary' : 'btn-secondary'}`, onClick: () => updateStore(() => ({ theme: 'light' })) }, "\u2600 Light")))),
+        React.createElement("div", { className: "section-title" }, "Data"),
+        React.createElement("div", { style: { display: 'flex', gap: 10, marginBottom: 20, flexWrap: 'wrap' } },
+            React.createElement("button", { className: "btn btn-secondary", onClick: () => exportJSON(store) }, "\u2B07 Export All Data (JSON)"),
+            React.createElement("button", { className: "btn btn-secondary", onClick: () => exportCSV(store.sessions) }, "\u2B07 Export Sessions (CSV)")),
+        React.createElement("div", { style: { background: 'var(--red-bg)', border: '1px solid rgba(255,92,92,0.25)', borderRadius: 'var(--r)', padding: '16px 18px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' } },
+            React.createElement("div", null,
+                React.createElement("div", { style: { fontWeight: 500, fontSize: 14, color: 'var(--red)' } }, "Reset All Progress"),
+                React.createElement("div", { style: { fontSize: 12, color: 'var(--text2)', marginTop: 2 } }, "Permanently erases all stats, XP, streaks, and history.")),
+            React.createElement("button", { className: "btn btn-danger btn-sm", onClick: () => { if (confirm('Reset all progress? This cannot be undone.')) {
+                    localStorage.removeItem(STORAGE_KEY);
+                    location.reload();
+                } } }, "Reset")),
+        React.createElement("div", { style: { marginTop: 20, background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--r)', padding: 16 } },
+            React.createElement("div", { style: { fontWeight: 500, fontSize: 13, marginBottom: 8 } }, "Progress Snapshot"),
+            React.createElement("div", { style: { fontSize: 12, color: 'var(--text2)', lineHeight: 1.9 } },
+                React.createElement("div", null,
+                    "Streak: ",
+                    React.createElement("strong", { style: { color: 'var(--amber)' } },
+                        store.streak,
+                        " days \uD83D\uDD25")),
+                React.createElement("div", null,
+                    "XP: ",
+                    React.createElement("strong", { style: { color: 'var(--accent)' } },
+                        store.xp,
+                        " \u00B7 Level ",
+                        store.level || 1)),
+                React.createElement("div", null,
+                    "Lessons: ",
+                    React.createElement("strong", null,
+                        store.completedLessons.length,
+                        "/",
+                        LESSONS.length + ARABIC_LESSONS.length)),
+                React.createElement("div", null,
+                    "Sessions: ",
+                    React.createElement("strong", null, store.sessions.length)),
+                React.createElement("div", null,
+                    "Keys tracked: ",
+                    React.createElement("strong", null, Object.keys(store.keyStats || {}).length)),
+                React.createElement("div", null,
+                    "Achievements: ",
+                    React.createElement("strong", null,
+                        (store.achievements || []).length,
+                        "/",
+                        ACHIEVEMENTS.length))))));
+}
+function SettingRow({ label, desc, children }) {
+    return (React.createElement("div", { style: { background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--r)', padding: '14px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 14, flexWrap: 'wrap' } },
+        React.createElement("div", null,
+            React.createElement("div", { style: { fontWeight: 500, fontSize: 14 } }, label),
+            desc && React.createElement("div", { style: { fontSize: 12, color: 'var(--text2)', marginTop: 2 } }, desc)),
+        children));
+}
+// ════════════════════════════════════════════════════════════════
+// RENDER
+// ════════════════════════════════════════════════════════════════
+ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(App, null));
+
+</script>
+</body>
+</html>
