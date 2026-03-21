@@ -2,7 +2,6 @@ baseURL = "https://blog.almubaireek.com/"
 title = "Saad ALMubaireek – EE Projects & Experiments"
 theme = "PaperMod"
 
-# 🌐 Multilingual
 defaultContentLanguage = "en"
 defaultContentLanguageInSubdir = true
 
@@ -22,83 +21,56 @@ defaultContentLanguageInSubdir = true
         name = "Home"
         url = "/"
         weight = 1
+
       [[languages.en.menu.main]]
         name = "Projects"
         url = "/projects/"
         weight = 2
+
       [[languages.en.menu.main]]
         name = "Personal projects"
         url = "/personal-projects/"
         weight = 3
+
+      # ✅ CRITICAL FIX: identifier must be a UNIQUE page path (not "Eco-Drive")
       [[languages.en.menu.main]]
         name = "Eco-Drive"
         identifier = "/projects/eco-drive"
         pageRef = "/projects/eco-drive"
+        url = "/projects/eco-drive/"
         weight = 4
 
+      # ✅ Same rule here
+      [[languages.en.menu.main]]
+        name = "Smart IoT Electric Extension"
+        identifier = "/projects/smart-iot-electric-extension"
+        pageRef = "/projects/smart-iot-electric-extension"
+        url = "/projects/smart-iot-electric-extension/"
+        weight = 5
 
       [[languages.en.menu.main]]
         name = "Tutorials"
         url = "/tutorials/"
-        weight = 5
+        weight = 6
+
       [[languages.en.menu.main]]
         name = "3D Design"
         url = "/3d-design/"
-        weight = 6
+        weight = 7
+
       [[languages.en.menu.main]]
         name = "About"
         url = "/about/"
-        weight = 7
+        weight = 8
+
       [[languages.en.menu.main]]
         name = "Contact"
         url = "/contact/"
-        weight = 8
-
-
-
-  # -------------------------------
-  # Arabic version (disabled)
-  # Uncomment this block to re-enable
-  # -------------------------------
-  # [languages.ar]
-  #   languageName = "العربية"
-  #   weight = 2
-  #   contentDir = "content/ar"
-  #   languageDirection = "rtl"
-  #
-  #   [languages.ar.params]
-  #     heroTitle = "استكشاف الهندسة الكهربائية مشروعًا بعد آخر"
-  #     heroSubTitle = "تصميم الدوائر المطبوعة، حاويات ثلاثية الأبعاد، ولوحات المتحكمات الدقيقة"
-  #
-  #   [languages.ar.menu]
-  #     [[languages.ar.menu.main]]
-  #       name = "الرئيسية"
-  #       url = "/"
-  #       weight = 1
-  #     [[languages.ar.menu.main]]
-  #       name = "المشاريع"
-  #       url = "/projects/"
-  #       weight = 2
-  #     [[languages.ar.menu.main]]
-  #       name = "PCB & Hardware"
-  #       url = "/pcb-hardware/"
-  #       weight = 3
-  #     [[languages.ar.menu.main]]
-  #       name = "شروحات"
-  #       url = "/tutorials/"
-  #       weight = 4
-  #     [[languages.ar.menu.main]]
-  #       name = "تصاميم ثلاثية الأبعاد"
-  #       url = "/3d-design/"
-  #       weight = 5
-  #     [[languages.ar.menu.main]]
-  #       name = "نبذة"
-  #       url = "/about/"
-  #       weight = 6
-  #     [[languages.ar.menu.main]]
-  #       name = "تواصل"
-  #       url = "/contact/"
-  #       weight = 7
+        weight = 9
+      [[languages.en.menu.main]]
+        name = "TypeCoach"
+        url = "/typecoach/"
+        weight = 10
 
 [pagination]
   pagerSize = 5
@@ -117,7 +89,7 @@ defaultContentLanguageInSubdir = true
   heroImage = "/images/hero-banner.jpg"
   sidebarShow = true
   sidebarWidgets = ["search","categories","social","downloads"]
-  ShowLangSwitch = false   # hide language switcher for now
+  ShowLangSwitch = false
 
 [params.social]
   github = "https://github.com/s2qx"
