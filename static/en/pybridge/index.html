@@ -1,0 +1,2460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>PyBridge — Python for C++ Developers</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet"/>
+<style>
+/* ══════════════════════════════════════════════
+   ROOT VARIABLES & RESET
+══════════════════════════════════════════════ */
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#faf6f1;--surface:#ffffff;--surface2:#f3ece6;--surface3:#ede3db;
+  --border:#d7ccc8;--border2:#bcaaa4;
+  --text:#2c2c2c;--text2:#5f5f5f;--text3:#9e9e9e;
+  --accent:#ef6c00;--accent2:#e65100;--accent-bg:rgba(239,108,0,0.10);
+  --accent-light:#ff9800;
+  --green:#2e7d32;--green-bg:rgba(46,125,50,0.10);
+  --red:#c62828;--red-bg:rgba(198,40,40,0.10);
+  --amber:#f9a825;--amber-bg:rgba(249,168,37,0.12);
+  --blue:#1565c0;--blue-bg:rgba(21,101,192,0.10);
+  --cyan:#00838f;--cyan-bg:rgba(0,131,143,0.10);
+  --python:#1565c0;--cpp:#bf360c;
+  --r:10px;--r2:14px;--r3:20px;
+  --shadow:0 4px 24px rgba(62,39,35,0.13);
+  --shadow2:0 2px 8px rgba(62,39,35,0.08);
+  font-family:'DM Sans',sans-serif;
+}
+body.dark{
+  --bg:#121212;--surface:#1e1e1e;--surface2:#252525;--surface3:#2c2c2c;
+  --border:#4e342e;--border2:#6d4c41;
+  --text:#e0e0e0;--text2:#b0bec5;--text3:#78909c;
+  --accent:#ff9800;--accent2:#ffcc80;--accent-bg:rgba(255,152,0,0.14);
+  --accent-light:#ffb74d;
+  --green:#66bb6a;--green-bg:rgba(102,187,106,0.12);
+  --red:#ef5350;--red-bg:rgba(239,83,80,0.14);
+  --amber:#ffb300;--amber-bg:rgba(255,179,0,0.14);
+  --blue:#42a5f5;--blue-bg:rgba(66,165,245,0.12);
+  --cyan:#26c6da;--cyan-bg:rgba(38,198,218,0.12);
+  --python:#42a5f5;--cpp:#ff8a65;
+  --shadow:0 4px 24px rgba(0,0,0,0.5);
+  --shadow2:0 2px 8px rgba(0,0,0,0.3);
+}
+body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;transition:background 0.3s,color 0.3s}
+button{font-family:'DM Sans',sans-serif;cursor:pointer;border:none;transition:all 0.2s}
+input,textarea,select{font-family:'DM Sans',sans-serif}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+code,pre,.mono{font-family:'JetBrains Mono',monospace}
+
+/* ══════════════════════════════════════════════
+   LAYOUT
+══════════════════════════════════════════════ */
+#app{display:flex;flex-direction:column;min-height:100vh}
+
+/* NAV */
+.nav{
+  position:sticky;top:0;z-index:100;
+  background:var(--surface);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:0;
+  padding:0 20px;
+  box-shadow:var(--shadow2);
+  height:58px;
+}
+.nav-brand{
+  font-weight:700;font-size:16px;color:var(--accent2);
+  display:flex;align-items:center;gap:8px;margin-right:20px;white-space:nowrap;
+}
+.nav-brand span.logo{
+  background:linear-gradient(135deg,#bf360c,#ef6c00);
+  color:#fff;width:30px;height:30px;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;font-size:15px;
+}
+.nav-tabs{display:flex;align-items:center;gap:2px;flex:1;overflow-x:auto}
+.nav-tab{
+  padding:8px 14px;border-radius:8px;font-size:13px;font-weight:500;
+  color:var(--text2);background:transparent;white-space:nowrap;
+  transition:all 0.15s;
+}
+.nav-tab:hover{background:var(--surface2);color:var(--accent2)}
+.nav-tab.active{background:var(--accent-bg);color:var(--accent2);font-weight:600}
+.nav-right{display:flex;align-items:center;gap:10px;margin-left:auto}
+.streak-pill{
+  display:flex;align-items:center;gap:5px;
+  background:var(--amber-bg);border:1px solid rgba(217,119,6,0.2);
+  border-radius:20px;padding:5px 12px;font-size:13px;font-weight:600;color:var(--amber);
+}
+.xp-pill{
+  display:flex;align-items:center;gap:5px;
+  background:var(--accent-bg);border:1px solid var(--border);
+  border-radius:20px;padding:5px 12px;font-size:13px;font-weight:600;color:var(--accent2);
+}
+.theme-btn{
+  width:34px;height:34px;border-radius:8px;
+  background:var(--surface2);border:1px solid var(--border);
+  font-size:16px;display:flex;align-items:center;justify-content:center;
+}
+.theme-btn:hover{background:var(--surface3)}
+
+/* PAGE */
+.page{display:none;padding:28px 28px 60px;max-width:1200px;margin:0 auto;width:100%}
+.page.active{display:block}
+
+/* SECTION HEADER */
+.section-header{margin-bottom:24px}
+.section-title{font-size:22px;font-weight:700;color:var(--text);margin-bottom:4px}
+.section-sub{font-size:14px;color:var(--text2)}
+
+/* CARDS */
+.card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r2);padding:20px;box-shadow:var(--shadow2);
+}
+.card-sm{padding:14px 16px}
+.card-grid{display:grid;gap:16px}
+.grid-2{grid-template-columns:repeat(2,1fr)}
+.grid-3{grid-template-columns:repeat(3,1fr)}
+.grid-4{grid-template-columns:repeat(4,1fr)}
+
+/* STAT CARDS */
+.stat-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r2);padding:18px 20px;
+  display:flex;flex-direction:column;gap:6px;
+}
+.stat-icon{font-size:22px;margin-bottom:2px}
+.stat-label{font-size:12px;color:var(--text2);font-weight:500}
+.stat-value{font-size:26px;font-weight:700;color:var(--text);line-height:1}
+.stat-sub{font-size:11px;color:var(--text3)}
+
+/* PROGRESS BAR */
+.progress-wrap{background:var(--surface2);border-radius:99px;overflow:hidden;height:8px}
+.progress-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--accent),var(--accent-light));transition:width 0.5s ease}
+
+/* BUTTONS */
+.btn{
+  padding:10px 18px;border-radius:var(--r);font-size:14px;font-weight:600;
+  display:inline-flex;align-items:center;gap:7px;
+}
+.btn-primary{background:linear-gradient(135deg,var(--accent2),var(--accent-light));color:#fff;box-shadow:0 2px 8px rgba(239,108,0,0.30)}
+.btn-primary:hover{opacity:0.9;transform:translateY(-1px)}
+.btn-secondary{background:var(--surface2);color:var(--text2);border:1px solid var(--border)}
+.btn-secondary:hover{background:var(--surface3)}
+.btn-success{background:var(--green);color:#fff}
+.btn-success:hover{opacity:0.9}
+.btn-danger{background:var(--red);color:#fff}
+.btn-sm{padding:7px 13px;font-size:13px}
+.btn-xs{padding:5px 10px;font-size:12px}
+
+/* BADGES/CHIPS */
+.chip{
+  display:inline-flex;align-items:center;gap:4px;
+  padding:3px 10px;border-radius:99px;font-size:11px;font-weight:600;
+}
+.chip-accent{background:var(--accent-bg);color:var(--accent2)}
+.chip-green{background:var(--green-bg);color:var(--green)}
+.chip-amber{background:var(--amber-bg);color:var(--amber)}
+.chip-red{background:var(--red-bg);color:var(--red)}
+.chip-blue{background:var(--blue-bg);color:var(--blue)}
+.chip-cyan{background:var(--cyan-bg);color:var(--cyan)}
+
+/* CODE BLOCKS */
+.code-block{
+  background:var(--surface2);border:1px solid var(--border);
+  border-radius:var(--r);padding:14px 16px;
+  font-family:'JetBrains Mono',monospace;font-size:13px;
+  line-height:1.6;overflow-x:auto;white-space:pre;color:var(--text);
+}
+.code-label{
+  font-size:11px;font-weight:700;letter-spacing:0.08em;
+  padding:3px 8px;border-radius:4px;margin-bottom:8px;display:inline-block;
+}
+.label-cpp{background:rgba(249,115,22,0.15);color:var(--cpp)}
+.label-py{background:rgba(59,130,246,0.15);color:var(--python)}
+
+/* COMPARE GRID */
+.compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.compare-col{border-radius:var(--r2);overflow:hidden;border:1px solid var(--border)}
+.compare-header{
+  padding:10px 14px;font-size:12px;font-weight:700;letter-spacing:0.06em;
+  display:flex;align-items:center;gap:7px;
+}
+.compare-header.cpp{background:rgba(249,115,22,0.12);color:var(--cpp)}
+.compare-header.py{background:rgba(59,130,246,0.12);color:var(--python)}
+.compare-body{padding:14px;background:var(--surface2);font-family:'JetBrains Mono',monospace;font-size:12.5px;line-height:1.7;white-space:pre;overflow-x:auto}
+
+/* LESSON CARD */
+.lesson-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r2);padding:20px;cursor:pointer;
+  transition:all 0.2s;display:flex;align-items:center;gap:16px;
+}
+.lesson-card:hover{border-color:var(--border2);box-shadow:var(--shadow)}
+.lesson-card.locked{opacity:0.5;cursor:not-allowed}
+.lesson-card.completed{border-color:rgba(5,150,105,0.3);background:rgba(5,150,105,0.03)}
+.lesson-num{
+  width:42px;height:42px;border-radius:10px;
+  background:var(--surface2);border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;color:var(--text2);flex-shrink:0;
+}
+.lesson-num.completed{background:var(--green-bg);border-color:rgba(46,125,50,0.3);color:var(--green)}
+.lesson-num.active{background:var(--accent-bg);border-color:rgba(239,108,0,0.3);color:var(--accent2)}
+.lesson-info{flex:1}
+.lesson-title{font-weight:600;font-size:15px;margin-bottom:3px}
+.lesson-desc{font-size:12px;color:var(--text2)}
+
+/* LESSON DETAIL */
+.lesson-detail{display:none}
+.lesson-detail.active{display:block}
+.lesson-section{margin-bottom:24px}
+.lesson-section-title{
+  font-size:13px;font-weight:700;letter-spacing:0.06em;
+  color:var(--text2);margin-bottom:10px;text-transform:uppercase;
+}
+.diff-item{
+  background:var(--surface2);border-left:3px solid var(--border2);
+  border-radius:0 var(--r) var(--r) 0;padding:10px 14px;
+  font-size:13.5px;line-height:1.6;margin-bottom:8px;
+}
+.mistake-box{
+  background:var(--red-bg);border:1px solid rgba(198,40,40,0.2);
+  border-radius:var(--r);padding:14px 16px;font-size:13.5px;
+}
+.challenge-box{
+  background:var(--amber-bg);border:1px solid rgba(217,119,6,0.2);
+  border-radius:var(--r2);padding:20px;
+}
+.challenge-title{font-weight:700;font-size:15px;margin-bottom:8px;color:var(--amber)}
+.hint-box{
+  background:var(--amber-bg);border:1px solid rgba(217,119,6,0.2);
+  border-radius:var(--r);padding:12px 14px;font-size:13px;margin-top:12px;display:none;
+}
+.answer-box{
+  background:var(--green-bg);border:1px solid rgba(5,150,105,0.2);
+  border-radius:var(--r);padding:14px;margin-top:12px;display:none;
+}
+
+/* TOAST */
+.toast{
+  position:fixed;bottom:24px;right:24px;z-index:999;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r2);padding:14px 18px;box-shadow:var(--shadow);
+  display:flex;align-items:center;gap:10px;font-size:14px;font-weight:500;
+  transform:translateY(80px);opacity:0;transition:all 0.3s;pointer-events:none;
+  max-width:320px;
+}
+.toast.show{transform:translateY(0);opacity:1}
+
+/* ACHIEVEMENT GRID */
+.badge-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r2);padding:18px;text-align:center;
+  transition:all 0.2s;
+}
+.badge-card.unlocked{border-color:rgba(239,108,0,0.35);background:var(--accent-bg)}
+.badge-card.locked{opacity:0.45}
+.badge-icon{font-size:32px;margin-bottom:8px}
+.badge-name{font-size:13px;font-weight:600;margin-bottom:4px}
+.badge-desc{font-size:11px;color:var(--text2)}
+
+/* PRACTICE */
+.practice-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r2);padding:24px;margin-bottom:20px;
+}
+.practice-question{font-size:15px;font-weight:600;margin-bottom:14px}
+.practice-input{
+  width:100%;background:var(--surface2);border:1px solid var(--border);
+  border-radius:var(--r);padding:12px 14px;color:var(--text);
+  font-family:'JetBrains Mono',monospace;font-size:13px;resize:vertical;
+  min-height:80px;outline:none;transition:border 0.2s;
+}
+.practice-input:focus{border-color:var(--border2)}
+.feedback-box{margin-top:12px;border-radius:var(--r);padding:12px 14px;font-size:13.5px;display:none}
+.feedback-correct{background:var(--green-bg);border:1px solid rgba(5,150,105,0.2);color:var(--green)}
+.feedback-wrong{background:var(--red-bg);border:1px solid rgba(220,38,38,0.2);color:var(--red)}
+
+/* DAILY CHALLENGE */
+.daily-card{
+  background:linear-gradient(135deg,#e65100,#ef6c00,#ff9800);
+  border-radius:var(--r3);padding:28px;color:#fff;position:relative;overflow:hidden;
+}
+.daily-card::before{
+  content:'';position:absolute;top:-40px;right:-40px;
+  width:180px;height:180px;border-radius:50%;background:rgba(255,255,255,0.08);
+}
+.daily-card::after{
+  content:'';position:absolute;bottom:-60px;right:60px;
+  width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,0.05);
+}
+
+/* ANALYTICS */
+.bar-chart{display:flex;align-items:flex-end;gap:8px;height:120px;padding:0 4px}
+.bar-col{display:flex;flex-direction:column;align-items:center;gap:4px;flex:1}
+.bar{width:100%;border-radius:4px 4px 0 0;background:linear-gradient(180deg,var(--accent-light),var(--accent));min-height:4px;transition:height 0.6s ease}
+.bar-label{font-size:10px;color:var(--text3)}
+
+/* CHEAT SHEET */
+.cs-table{width:100%;border-collapse:collapse;font-size:13px}
+.cs-table th{background:var(--surface2);padding:10px 14px;text-align:left;font-weight:600;font-size:12px;color:var(--text2);border-bottom:1px solid var(--border)}
+.cs-table td{padding:10px 14px;border-bottom:1px solid var(--border);vertical-align:top}
+.cs-table tr:last-child td{border-bottom:none}
+.cs-table code{font-family:'JetBrains Mono',monospace;font-size:12px;background:var(--surface2);padding:2px 6px;border-radius:4px}
+
+/* SETTINGS */
+.setting-row{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r);padding:14px 16px;
+  display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;
+  margin-bottom:1px;
+}
+.toggle{
+  width:42px;height:24px;border-radius:12px;background:var(--border2);
+  position:relative;cursor:pointer;transition:background 0.2s;flex-shrink:0;
+}
+.toggle.on{background:var(--accent)}
+.toggle::after{
+  content:'';position:absolute;top:3px;left:3px;
+  width:18px;height:18px;border-radius:50%;background:#fff;
+  transition:transform 0.2s;
+}
+.toggle.on::after{transform:translateX(18px)}
+
+/* DASHBOARD HERO */
+.dashboard-hero{
+  background:linear-gradient(135deg,#bf360c 0%,#ef6c00 50%,#ff9800 100%);
+  border-radius:var(--r3);padding:32px;color:#fff;margin-bottom:24px;
+  position:relative;overflow:hidden;
+}
+.dashboard-hero::before{
+  content:'🐍';font-size:120px;position:absolute;right:20px;top:-10px;opacity:0.12;
+  transform:rotate(-15deg);
+}
+
+/* XP LEVEL BAR */
+.level-ring{
+  width:52px;height:52px;border-radius:50%;
+  background:conic-gradient(var(--accent-light) 0%,var(--accent) 0%,rgba(255,255,255,0.2) 0%);
+  display:flex;align-items:center;justify-content:center;
+  position:relative;flex-shrink:0;
+}
+.level-ring-inner{
+  width:40px;height:40px;border-radius:50%;
+  background:var(--accent);
+  display:flex;align-items:center;justify-content:center;
+  font-weight:700;font-size:15px;color:#fff;
+}
+
+/* ACTIVITY DOTS */
+.activity-grid{display:flex;gap:3px;flex-wrap:wrap}
+.activity-dot{
+  width:12px;height:12px;border-radius:3px;background:var(--surface2);
+  border:1px solid var(--border);
+}
+.activity-dot.done{background:var(--accent);border-color:var(--accent-light)}
+.activity-dot.today{background:var(--amber);border-color:var(--amber)}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+  .page{padding:16px 14px 60px}
+  .grid-4{grid-template-columns:repeat(2,1fr)}
+  .grid-3{grid-template-columns:repeat(2,1fr)}
+  .grid-2{grid-template-columns:1fr}
+  .compare-grid{grid-template-columns:1fr}
+  .nav-tab{font-size:12px;padding:7px 10px}
+  .dashboard-hero{padding:22px}
+}
+@media(max-width:480px){
+  .grid-3,.grid-4{grid-template-columns:1fr}
+}
+
+/* ANIMATIONS */
+@keyframes fadeInUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.page.active .card,.page.active .stat-card,.page.active .badge-card,.page.active .lesson-card{
+  animation:fadeInUp 0.3s ease both;
+}
+</style>
+</head>
+<body>
+<script>
+try{var _d=JSON.parse(localStorage.getItem('pybridge_v1')||'{}');if(_d.theme==='dark')document.body.className='dark';}catch(e){}
+</script>
+
+<div id="app">
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-brand"><span class="logo">🐍</span>PyBridge</div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showPage('dashboard')">🏠 Dashboard</button>
+    <button class="nav-tab" onclick="showPage('lessons')">📚 Lessons</button>
+    <button class="nav-tab" onclick="showPage('practice')">⚡ Practice</button>
+    <button class="nav-tab" onclick="showPage('daily')">🎯 Daily</button>
+    <button class="nav-tab" onclick="showPage('analytics')">📊 Analytics</button>
+    <button class="nav-tab" onclick="showPage('badges')">🏆 Badges</button>
+    <button class="nav-tab" onclick="showPage('cheatsheet')">📄 Cheat Sheet</button>
+    <button class="nav-tab" onclick="showPage('settings')">⚙️ Settings</button>
+  </div>
+  <div class="nav-right">
+    <div class="streak-pill" id="nav-streak">🔥 0</div>
+    <div class="xp-pill" id="nav-xp">⚡ 0 XP</div>
+    <button class="theme-btn" onclick="toggleTheme()" id="theme-btn">🌙</button>
+  </div>
+</nav>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- ══════════════════════════════════
+     DASHBOARD
+══════════════════════════════════ -->
+<div class="page active" id="page-dashboard">
+  <div class="dashboard-hero">
+    <div style="display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap">
+      <div style="flex:1">
+        <div style="font-size:13px;opacity:0.85;margin-bottom:4px">Welcome back, Engineer 👋</div>
+        <h1 style="font-size:26px;font-weight:700;margin-bottom:8px" id="hero-greeting">Ready to bridge the gap?</h1>
+        <div style="font-size:14px;opacity:0.8;max-width:480px">You already know C++. PyBridge shows you Python through the lens you already have — side-by-side, no fluff.</div>
+        <div style="margin-top:18px;display:flex;gap:10px;flex-wrap:wrap">
+          <button class="btn" style="background:rgba(255,255,255,0.2);color:#fff;backdrop-filter:blur(8px)" onclick="continueLearning()">▶ Continue Learning</button>
+          <button class="btn" style="background:rgba(255,255,255,0.12);color:#fff;backdrop-filter:blur(8px)" onclick="showPage('daily')">🎯 Today's Challenge</button>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end">
+        <div style="background:rgba(255,255,255,0.15);border-radius:12px;padding:14px 18px;text-align:center;backdrop-filter:blur(8px)">
+          <div style="font-size:28px;font-weight:700" id="hero-streak">0</div>
+          <div style="font-size:11px;opacity:0.8">Day Streak 🔥</div>
+        </div>
+        <div style="background:rgba(255,255,255,0.15);border-radius:12px;padding:14px 18px;text-align:center;backdrop-filter:blur(8px)">
+          <div style="font-size:28px;font-weight:700" id="hero-xp">0</div>
+          <div style="font-size:11px;opacity:0.8">XP Points ⚡</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STAT CARDS -->
+  <div class="card-grid grid-4" style="margin-bottom:20px">
+    <div class="stat-card">
+      <div class="stat-icon">📚</div>
+      <div class="stat-label">Lessons Done</div>
+      <div class="stat-value" id="stat-lessons">0 / 20</div>
+      <div class="progress-wrap" style="margin-top:8px"><div class="progress-fill" id="stat-progress" style="width:0%"></div></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">🎯</div>
+      <div class="stat-label">Level</div>
+      <div class="stat-value" id="stat-level">1</div>
+      <div class="stat-sub" id="stat-level-name">Python Novice</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">✅</div>
+      <div class="stat-label">Challenges Done</div>
+      <div class="stat-value" id="stat-challenges">0</div>
+      <div class="stat-sub">Daily completed</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">🏆</div>
+      <div class="stat-label">Badges</div>
+      <div class="stat-value" id="stat-badges">0 / 13</div>
+      <div class="stat-sub">Achievements</div>
+    </div>
+  </div>
+
+  <!-- DAILY + NEXT LESSON -->
+  <div class="card-grid grid-2" style="margin-bottom:20px">
+    <div class="daily-card" id="dash-daily-card">
+      <div style="font-size:12px;opacity:0.8;margin-bottom:6px">TODAY'S CHALLENGE</div>
+      <div style="font-size:18px;font-weight:700;margin-bottom:10px" id="dash-daily-title">Loading...</div>
+      <div style="font-size:13px;opacity:0.85;margin-bottom:16px" id="dash-daily-desc"></div>
+      <button class="btn" style="background:rgba(255,255,255,0.2);color:#fff;font-size:13px" onclick="showPage('daily')">Go to Challenge →</button>
+      <div id="dash-daily-done" style="display:none;margin-top:10px;font-size:13px;background:rgba(255,255,255,0.15);border-radius:8px;padding:8px 12px">✅ Completed today! +25 XP</div>
+    </div>
+    <div class="card">
+      <div style="font-size:12px;color:var(--text3);font-weight:600;margin-bottom:10px;letter-spacing:0.06em">NEXT LESSON</div>
+      <div id="next-lesson-card">
+        <div style="font-size:16px;font-weight:600;margin-bottom:6px" id="next-lesson-title">Lesson 1: Variables</div>
+        <div style="font-size:13px;color:var(--text2);margin-bottom:14px" id="next-lesson-desc">Variable assignment and type system</div>
+        <div class="progress-wrap" style="margin-bottom:12px"><div class="progress-fill" id="next-lesson-prog" style="width:0%"></div></div>
+        <button class="btn btn-primary btn-sm" onclick="continueLearning()">Continue Learning ▶</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- WEEKLY + ACTIVITY -->
+  <div class="card-grid grid-2" style="margin-bottom:20px">
+    <div class="card">
+      <div style="font-size:13px;font-weight:600;margin-bottom:16px">Weekly XP</div>
+      <div class="bar-chart" id="weekly-chart"></div>
+      <div style="display:flex;justify-content:space-between;margin-top:6px">
+        <div id="weekly-labels" style="display:flex;gap:8px;flex:1"></div>
+      </div>
+    </div>
+    <div class="card">
+      <div style="font-size:13px;font-weight:600;margin-bottom:12px">Activity — Last 28 Days</div>
+      <div class="activity-grid" id="activity-grid"></div>
+      <div style="margin-top:12px;display:flex;gap:12px;font-size:11px;color:var(--text3)">
+        <span>● Active</span><span style="opacity:0.5">○ Inactive</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- RECENT ACTIVITY -->
+  <div class="card">
+    <div style="font-size:13px;font-weight:600;margin-bottom:14px">Recent Activity</div>
+    <div id="recent-activity">
+      <div style="color:var(--text3);font-size:13px">No activity yet. Start your first lesson!</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     LESSONS
+══════════════════════════════════ -->
+<div class="page" id="page-lessons">
+  <div id="lesson-list-view">
+    <div class="section-header">
+      <div class="section-title">Lesson Roadmap</div>
+      <div class="section-sub">20 lessons — C++ to Python, step by step. Complete each to unlock the next.</div>
+    </div>
+    <div id="lessons-list" style="display:flex;flex-direction:column;gap:10px"></div>
+  </div>
+  <div id="lesson-detail-view" style="display:none">
+    <button class="btn btn-secondary btn-sm" onclick="backToLessons()" style="margin-bottom:20px">← Back to Lessons</button>
+    <div id="lesson-content"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     PRACTICE
+══════════════════════════════════ -->
+<div class="page" id="page-practice">
+  <div class="section-header">
+    <div class="section-title">⚡ Practice Mode</div>
+    <div class="section-sub">Sharpen your Python instincts through hands-on challenges</div>
+  </div>
+  <div id="practice-container"></div>
+</div>
+
+<!-- ══════════════════════════════════
+     DAILY CHALLENGE
+══════════════════════════════════ -->
+<div class="page" id="page-daily">
+  <div class="section-header">
+    <div class="section-title">🎯 Daily Challenge</div>
+    <div class="section-sub" id="daily-date-label"></div>
+  </div>
+  <div id="daily-content"></div>
+</div>
+
+<!-- ══════════════════════════════════
+     ANALYTICS
+══════════════════════════════════ -->
+<div class="page" id="page-analytics">
+  <div class="section-header">
+    <div class="section-title">📊 Analytics</div>
+    <div class="section-sub">Track your learning progress over time</div>
+  </div>
+  <div id="analytics-content"></div>
+</div>
+
+<!-- ══════════════════════════════════
+     BADGES
+══════════════════════════════════ -->
+<div class="page" id="page-badges">
+  <div class="section-header">
+    <div class="section-title">🏆 Badges & Achievements</div>
+    <div class="section-sub">Unlock badges as you progress through your Python journey</div>
+  </div>
+  <div id="badges-content" class="card-grid grid-4"></div>
+</div>
+
+<!-- ══════════════════════════════════
+     CHEAT SHEET
+══════════════════════════════════ -->
+<div class="page" id="page-cheatsheet">
+  <div class="section-header">
+    <div class="section-title">📄 C++ → Python Cheat Sheet</div>
+    <div class="section-sub">Quick reference for syntax translation</div>
+  </div>
+  <div id="cheatsheet-content"></div>
+</div>
+
+<!-- ══════════════════════════════════
+     SETTINGS
+══════════════════════════════════ -->
+<div class="page" id="page-settings">
+  <div class="section-header">
+    <div class="section-title">⚙️ Settings</div>
+    <div class="section-sub">Customize your learning experience</div>
+  </div>
+  <div id="settings-content"></div>
+</div>
+
+</div><!-- #app -->
+
+<script>
+// ════════════════════════════════════════════════════
+// DATA
+// ════════════════════════════════════════════════════
+
+const STORAGE_KEY = 'pybridge_v1';
+
+const LEVEL_NAMES = ['Python Novice','Syntax Seeker','Code Migrant','C++ Exile','Python Apprentice','Loop Master','Function Wizard','OOP Scholar','Python Journeyman','Python Expert'];
+
+const ACHIEVEMENTS = [
+  {id:'first_lesson',icon:'🌱',name:'First Step',desc:'Complete your first lesson'},
+  {id:'streak3',icon:'🔥',name:'3-Day Streak',desc:'Practice 3 days in a row'},
+  {id:'streak7',icon:'💎',name:'Weekly Warrior',desc:'7-day streak'},
+  {id:'streak30',icon:'👑',name:'Monthly Master',desc:'30-day streak'},
+  {id:'lessons5',icon:'📖',name:'Quick Learner',desc:'Complete 5 lessons'},
+  {id:'lessons10',icon:'📚',name:'Halfway There',desc:'Complete 10 lessons'},
+  {id:'lessons20',icon:'🎓',name:'Python Graduate',desc:'Complete all 20 lessons'},
+  {id:'daily1',icon:'🎯',name:'Daily Challenge',desc:'Complete your first daily challenge'},
+  {id:'daily7',icon:'🏅',name:'Challenge Streak',desc:'Complete 7 daily challenges'},
+  {id:'control_flow',icon:'🔀',name:'Flow Master',desc:'Complete all control flow lessons'},
+  {id:'functions',icon:'⚡',name:'Functions Explorer',desc:'Complete the functions lesson'},
+  {id:'data_struct',icon:'🗂️',name:'Data Structures Explorer',desc:'Complete lists & dicts lessons'},
+  {id:'practice10',icon:'💪',name:'Practice Pro',desc:'Complete 10 practice exercises'},
+];
+
+const LESSONS_DATA = [
+{
+  id:1,title:'Variables & Assignment',tag:'Beginner',
+  desc:'How Python handles variable declaration — no types, no semicolons',
+  goal:'Learn to declare any variable in Python. No type keywords, no semicolons, no headers.',
+  cpp:`// C++: explicit types required
+int age = 25;
+double gpa = 3.85;
+bool isStudent = true;
+std::string name = "Saad";
+
+// const for constants
+const int MAX = 100;`,
+  py:`# Python: dynamic typing — just assign
+age = 25
+gpa = 3.85
+is_student = True
+name = "Saad"
+
+# Constants by convention (ALL_CAPS)
+MAX = 100
+
+# Multiple assignment on one line
+x, y, z = 1, 2, 3`,
+  diffs:[
+    'Python uses snake_case by convention; C++ typically uses camelCase',
+    'No type keywords (int, double, bool) — Python infers the type at runtime',
+    'No semicolons at the end of lines',
+    'Boolean literals are True/False (capital first letter), not true/false',
+    'No const keyword — constants are UPPER_CASE by convention only',
+    'Multiple assignment in one line: x, y = 1, 2 (no C++ equivalent without std::tie)',
+  ],
+  mindset:'Think of Python variables as sticky labels attached to objects, not typed storage boxes. Any label can be moved to any object at any time.',
+  mistake:'Writing int x = 5; is a SyntaxError in Python. Also, True/False must be capitalized — true or false will raise a NameError.',
+  challenge:'Create four variables: your name (string), your student ID (integer), your GPA (float), and whether you passed (boolean). Assign realistic values — no printing yet.',
+  hint:'Just write: name = "Saad"  then on the next line  student_id = 2021001  and so on.',
+  answer:`# Lesson 1 challenge — assignment only, no print needed yet
+name = "Saad"
+student_id = 2021001
+gpa = 3.75
+passed = True
+# That's it! Printing is taught in Lesson 3.`,
+},
+{
+  id:2,title:'Data Types',tag:'Beginner',
+  desc:'Python\'s built-in types versus C++\'s type system',
+  goal:'Understand how Python\'s type system differs from C++. Learn to use type() and isinstance() to inspect types.',
+  cpp:`int x = 10;
+double pi = 3.14159;
+char c = 'A';
+bool flag = false;
+std::string s = "hello";
+
+// Check size
+sizeof(int); // 4 bytes`,
+  py:`x = 10            # int (arbitrary precision!)
+pi = 3.14159      # float (64-bit double)
+c = 'A'           # str — no char type in Python!
+flag = False      # bool
+s = "hello"       # str
+
+# Inspect types (useful in the REPL / interactive mode)
+type(x)               # <class 'int'>
+isinstance(x, int)    # True
+isinstance(pi, float) # True`,
+  diffs:[
+    'No char type — a single character is just a str of length 1',
+    'int in Python has arbitrary precision — it never overflows!',
+    'float is a 64-bit double by default — no separate "double" type',
+    'Use type() or isinstance() to inspect types — there is no sizeof()',
+    'Python also has a complex number type: z = 3 + 4j',
+  ],
+  mindset:'Python types are classes. int, float, str, bool are all full objects. There is no primitive vs. reference distinction like in C++.',
+  mistake:'Assuming int will overflow like in C++. Python int grows as large as your memory allows. Also: 7/2 gives 3.5, not 3 — use 7//2 for integer division (covered in Lesson 5).',
+  challenge:'Create one variable of each type: int, float, str, and bool. Then write two isinstance() checks to verify the types of any two of them. No printing — just the assignments and checks.',
+  hint:'isinstance(42, int) returns True. You can assign the result: result = isinstance(x, int)',
+  answer:`# Lesson 2 — type inspection, no print yet
+a = 42
+b = 3.14
+c = "hello"
+d = True
+
+check_a = isinstance(a, int)    # True
+check_b = isinstance(b, float)  # True
+# Printing is introduced in Lesson 3`,
+},
+{
+  id:3,title:'Printing Output',tag:'Beginner',
+  desc:'From printf/cout to Python\'s print() — your first output tool',
+  goal:'Learn how to display values in Python using print(). This is where output begins.',
+  cpp:`#include <iostream>
+using namespace std;
+
+int x = 5;
+cout << "Value: " << x << endl;
+printf("Pi = %.2f\\n", 3.14159);
+
+// No newline at end
+cout << "No newline" << flush;`,
+  py:`x = 5
+# Basic print — just pass values
+print("Value:", x)           # Value: 5
+
+# f-strings: Python's answer to printf
+print(f"Pi = {3.14159:.2f}") # Pi = 3.14
+
+# Control the newline
+print("No newline", end="")  # suppresses \\n
+print("A", "B", "C", sep=", ")  # A, B, C`,
+  diffs:[
+    'print() is a function — always use parentheses (SyntaxError without them)',
+    'f-strings embed variables directly: f"Hello {name}" — cleaner than printf',
+    'No << operator or endl — just pass comma-separated arguments',
+    'end="" suppresses the automatic newline at the end',
+    'sep=" " sets the separator between multiple arguments (default is a space)',
+  ],
+  mindset:'f-strings are your new printf. They evaluate full Python expressions inside the braces: print(f"{2 ** 10}") prints 1024 directly.',
+  mistake:'print "hello" (no parentheses) is valid Python 2 syntax but a SyntaxError in Python 3. Always use print("hello").',
+  challenge:'Using the variables you created in Lesson 1, print all four on a single line using an f-string. Then print the numbers 1 through 5 separated by dashes on one line.',
+  hint:'f-string: print(f"Name: {name}, ID: {student_id}"). For the numbers: print(1, 2, 3, 4, 5, sep="-")',
+  answer:`name = "Saad"
+student_id = 2021001
+gpa = 3.75
+passed = True
+print(f"Name: {name}, ID: {student_id}, GPA: {gpa}, Passed: {passed}")
+print(1, 2, 3, 4, 5, sep="-")`,
+},
+{
+  id:4,title:'Input',tag:'Beginner',
+  desc:'Getting user input — always a string, always needs casting',
+  goal:'Learn to read user input with input() and cast it to the right type before doing anything with it.',
+  cpp:`#include <iostream>
+std::string name;
+int age;
+
+std::cin >> name;
+std::cin >> age;
+// or for full line:
+std::getline(std::cin, name);`,
+  py:`# input() ALWAYS returns a string
+name = input("Enter your name: ")
+
+# Cast immediately for numbers
+age = int(input("Enter your age: "))
+gpa = float(input("Enter your GPA: "))
+
+# Safe input pattern — handles bad input
+try:
+    x = int(input("Enter a number: "))
+except ValueError:
+    print("That was not a valid integer!")`,
+  diffs:[
+    'input() always returns str — you MUST cast to int/float for numbers',
+    'No separate getline — input() reads the full line by default',
+    'No >> stream operator — input() is a simple function call',
+    'int() and float() replace atoi()/atof() from C',
+    'Use try/except ValueError to handle invalid input safely',
+  ],
+  mindset:'input() is deliberately simple. Python trusts you to cast. Think of it as: every user interaction gives you a string — your job is to interpret it.',
+  mistake:'Reading a number with input() then doing math on it: x = input() followed by x + 5 will raise TypeError because x is a string. Always cast immediately: x = int(input())',
+  challenge:'Ask the user for two integers, add them together, and print the result with an f-string.',
+  hint:'a = int(input("First number: "))  then same for b',
+  answer:`a = int(input("First number: "))
+b = int(input("Second number: "))
+print(f"{a} + {b} = {a + b}")`,
+},
+{
+  id:5,title:'Math Operations',tag:'Beginner',
+  desc:'Operators and math — what changed, what stayed the same',
+  goal:'Master Python\'s arithmetic operators, especially the critical division difference from C++.',
+  cpp:`int a = 7, b = 2;
+a + b;   // 9
+a - b;   // 5
+a * b;   // 14
+a / b;   // 3  ← integer division in C++!
+a % b;   // 1
+pow(2.0, 8);  // 256.0
+
+#include <cmath>
+sqrt(16.0);  // 4.0`,
+  py:`a, b = 7, 2
+a + b    # 9
+a - b    # 5
+a * b    # 14
+a / b    # 3.5  ← TRUE division (always float!)
+a // b   # 3    ← floor division (like C++ int/int)
+a % b    # 1    ← modulo, same as C++
+2 ** 8   # 256  ← power operator (no pow() needed)
+
+import math
+math.sqrt(16)   # 4.0`,
+  diffs:[
+    '/ always gives a float in Python: 7/2 → 3.5 (NOT 3 like in C++)',
+    '// is floor division — gives the same result as C++ integer division',
+    '** is the exponentiation operator — replaces pow() for most uses',
+    'No #include needed for basic math — import math for sqrt, sin, cos, etc.',
+    'Augmented assignments +=, -=, *=, //= work exactly like C++',
+  ],
+  mindset:'The / vs // split is the most important difference. In C++ you got integer division "for free" with int types. In Python, you must be intentional about which you want.',
+  mistake:'7/2 gives 3.5 in Python, not 3! If you want integer division like C++, always use 7//2. Many subtle bugs come from this.',
+  challenge:'Read two numbers from the user. Print their sum, difference, product, true division (2 decimal places), floor division, and the first raised to the power of the second.',
+  hint:'a / b for true division, a // b for floor, a ** b for power. Use f"{result:.2f}" for 2 decimal places.',
+  answer:`a = float(input("Enter a: "))
+b = float(input("Enter b: "))
+print(f"Sum: {a + b}")
+print(f"Difference: {a - b}")
+print(f"Product: {a * b}")
+print(f"True division: {a / b:.2f}")
+print(f"Floor division: {a // b}")
+print(f"Power: {a ** b}")`,
+},
+{
+  id:6,title:'if Statements',tag:'Beginner',
+  desc:'Conditional logic — indentation replaces braces',
+  goal:'Write your first Python if statement. Understand why indentation is syntax, not style.',
+  cpp:`int score = 85;
+if (score >= 90) {
+    cout << "A";
+}`,
+  py:`score = 85
+if score >= 90:
+    print("A")
+# Notes:
+# - No parentheses around the condition (optional but not idiomatic)
+# - No curly braces — the indented block IS the body
+# - The colon : is mandatory`,
+  diffs:[
+    'No parentheses required around the condition — if x > 0: is idiomatic',
+    'No curly braces — 4-space indentation defines the block boundary',
+    'Colon : at the end of the if line is mandatory (SyntaxError without it)',
+    'Python uses and/or/not instead of &&/||/!',
+  ],
+  mindset:'Indentation IS the syntax. A misaligned line is not just ugly — it is a bug. Python forces the readable style that good C++ developers use anyway.',
+  mistake:'Forgetting the colon after the condition is the most common beginner mistake: if x > 0 without the colon gives SyntaxError. Also: == is comparison, = is assignment — same rule as C++.',
+  challenge:'Read a number from the user. If it is even, print "Even". If nothing else applies, do nothing. Use the modulo operator.',
+  hint:'if number % 2 == 0:   — modulo works the same as in C++',
+  answer:`number = int(input("Enter a number: "))
+if number % 2 == 0:
+    print("Even")`,
+},
+{
+  id:7,title:'if / else / elif',tag:'Beginner',
+  desc:'Full conditional branching — elif replaces else if',
+  goal:'Learn the full if/elif/else chain. Understand that elif is Python\'s else if — not two keywords.',
+  cpp:`if (score >= 90) {
+    grade = "A";
+} else if (score >= 80) {
+    grade = "B";
+} else if (score >= 70) {
+    grade = "C";
+} else {
+    grade = "F";
+}`,
+  py:`if score >= 90:
+    grade = "A"
+elif score >= 80:
+    grade = "B"
+elif score >= 70:
+    grade = "C"
+else:
+    grade = "F"
+
+# Inline ternary (like C++ ?:)
+result = "Pass" if score >= 60 else "Fail"`,
+  diffs:[
+    'else if in C++ → elif in Python (one word, not two)',
+    'No curly braces — consistent indentation defines each block',
+    'Python ternary: value = "Pass" if score >= 60 else "Fail"  (like C++ ?: operator)',
+    'No switch statement for simple cases — use if/elif chains (match/case covered in Lesson 12)',
+  ],
+  mindset:'elif chains are clean and Pythonic. The ternary expression reads like plain English: "grade is A if score>=90, else B." Write it that way.',
+  mistake:'Writing else if (two words, C++ style) instead of elif. Python treats else as the end of the if chain and if as a new statement — you will get unexpected behavior or SyntaxError.',
+  challenge:'Grade calculator: read a score (0–100) and print the letter grade A/B/C/D/F using if/elif/else.',
+  hint:'Start from the top: if score >= 90: print("A") elif score >= 80: print("B") and so on down to else: print("F")',
+  answer:`score = int(input("Enter score (0-100): "))
+if score >= 90:
+    print("A")
+elif score >= 80:
+    print("B")
+elif score >= 70:
+    print("C")
+elif score >= 60:
+    print("D")
+else:
+    print("F")`,
+},
+{
+  id:8,title:'Comparison & Logical Operators',tag:'Beginner',
+  desc:'How Python expresses conditions — English words instead of symbols',
+  goal:'Replace &&, ||, ! with Python\'s and, or, not. Learn chained comparisons and the ternary expression.',
+  cpp:`a == b    // equal
+a != b    // not equal
+a > b     // greater
+a && b    // AND
+a || b    // OR
+!a        // NOT
+
+// Ternary
+int x = (a > b) ? a : b;`,
+  py:`a == b    # equal
+a != b    # not equal
+a > b     # greater
+a and b   # AND  (not &&)
+a or b    # OR   (not ||)
+not a     # NOT  (not !)
+
+# Ternary expression (like C++ ?:)
+x = a if a > b else b
+
+# Chained comparison — unique to Python
+0 <= score <= 100   # equivalent to score >= 0 && score <= 100`,
+  diffs:[
+    '&&, ||, ! are replaced by the English words and, or, not',
+    'Chained comparisons like 0 < x < 100 are valid and idiomatic Python',
+    'is checks object identity (like pointer equality) — use == for value comparison',
+    'Use is None (not == None) to check for null equivalents',
+  ],
+  mindset:'Python conditions read like plain English. "if x > 0 and x < 100" is already valid Python. The chained form "0 < x < 100" is even cleaner and has no C++ equivalent.',
+  mistake:'Using && or || raises SyntaxError. Also: is checks object identity, not value equality. Use == for comparing numbers and strings.',
+  challenge:'Read a number from the user. Print "Valid" if it is between 1 and 100 inclusive AND is even. Print "Invalid" otherwise. Use Python\'s chained comparison.',
+  hint:'if 1 <= n <= 100 and n % 2 == 0:',
+  answer:`n = int(input("Enter a number: "))
+if 1 <= n <= 100 and n % 2 == 0:
+    print("Valid")
+else:
+    print("Invalid")`,
+},
+{
+  id:9,title:'Truthiness & None',tag:'Beginner',
+  desc:'Short-circuit evaluation and Python\'s broader concept of "falsy"',
+  goal:'Understand what Python considers falsy, how None works as null, and how short-circuit evaluation differs from C++.',
+  cpp:`// Falsy in C++: 0, 0.0, nullptr, false
+if (x) { }          // truthy check
+if (ptr != nullptr) // null check`,
+  py:`# Falsy in Python: False, None, 0, 0.0, "", [], {}, ()
+# Everything else is truthy!
+
+x = 0
+if x:               # False — 0 is falsy
+    print("truthy")
+
+name = ""
+if name:            # False — empty string is falsy
+    print("has name")
+
+# None is Python's null
+result = None
+if result is None:  # correct way to check for None
+    print("no result yet")
+
+# Short-circuit: or/and return an operand, not just True/False
+y = None
+z = y or "default"  # z = "default" (y was falsy)`,
+  diffs:[
+    'Empty string "", empty list [], empty dict {} are all falsy — very useful',
+    'None is Python\'s null — use is None or is not None to check it',
+    'or returns the first truthy operand, not just True/False',
+    'x or "default" is idiomatic Python for providing a fallback value',
+  ],
+  mindset:'Python\'s broader truthiness lets you write "if my_data:" instead of "if my_data != NULL && my_data.size() > 0". Embrace it — it makes conditions shorter and more readable.',
+  mistake:'Checking None with ==: if x == None works but is not idiomatic. The correct Python style is if x is None. The is operator checks identity, and None is a singleton.',
+  challenge:'Assign a variable called message with an empty string. Using a single if/else, print the message if it is truthy, or print "No message" if it is falsy.',
+  hint:'if message:  treats an empty string as False automatically',
+  answer:`message = ""   # try changing this to "Hello!" to see the difference
+if message:
+    print(message)
+else:
+    print("No message")`,
+},
+{
+  id:10,title:'for Loops',tag:'Intermediate',
+  desc:'Python for loops are always range-based — closer to C++11 range-for',
+  goal:'Replace C++\'s three-part for(;;) with Python\'s for-in loop. Master range() and enumerate().',
+  cpp:`// Index loop
+for (int i = 0; i < 5; i++) {
+    cout << i;
+}
+
+// Range-based (C++11)
+for (auto x : myVector) {
+    cout << x;
+}
+
+// With index
+for (int i = 0; i < v.size(); i++) {
+    cout << i << ": " << v[i];
+}`,
+  py:`# Python for is always range-based
+for i in range(5):        # 0, 1, 2, 3, 4
+    print(i)
+
+# Iterate directly over a list
+for x in [10, 20, 30]:
+    print(x)
+
+# With index: use enumerate()
+for i, x in enumerate([10, 20, 30]):
+    print(i, x)  # 0 10 / 1 20 / 2 30
+
+# Counting down
+for i in range(10, 0, -1):
+    print(i)`,
+  diffs:[
+    'No three-part for(init; cond; step) — use range() instead',
+    'range(start, stop, step) — stop is exclusive (like < not <=)',
+    'Iterate directly over a list without indexing — cleaner than C++',
+    'enumerate() gives (index, value) pairs — replaces index-based loops',
+    'zip() loops two lists together: for a, b in zip(list1, list2)',
+  ],
+  mindset:'Python wants you to iterate over objects, not indices. Before writing for i in range(len(lst)):, ask: do I actually need the index? If not, just write for x in lst:',
+  mistake:'range(5) gives 0,1,2,3,4 — it stops before 5, not at 5. range(1,6) gives 1 to 5. This is the same exclusive-end rule as C++ iterator end().',
+  challenge:'Print the multiplication table for 7 (7×1 through 7×10) using a for loop with range() and an f-string.',
+  hint:'for i in range(1, 11):  — then print with f"7 × {i} = {7*i}"',
+  answer:`for i in range(1, 11):
+    print(f"7 × {i} = {7 * i}")`,
+},
+{
+  id:11,title:'while Loops',tag:'Intermediate',
+  desc:'while loops, break, continue — and why there is no do-while',
+  goal:'Write Python while loops with break and continue. Understand the while-True pattern as Python\'s do-while replacement.',
+  cpp:`int i = 0;
+while (i < 10) {
+    if (i == 5) break;
+    if (i % 2 == 0) { i++; continue; }
+    cout << i;
+    i++;
+}
+
+// do-while
+do { ... } while (condition);`,
+  py:`i = 0
+while i < 10:
+    if i == 5:
+        break       # same as C++
+    if i % 2 == 0:
+        i += 1
+        continue    # same as C++
+    print(i)
+    i += 1          # Python has no ++ operator!
+
+# Replacing do-while: use while True + break
+while True:
+    response = input("Type 'quit' to stop: ")
+    if response == "quit":
+        break`,
+  diffs:[
+    'No do-while — use while True: with a break condition at the end or inside',
+    'break and continue work exactly as in C++',
+    'while-else: the else block runs only if the loop ends without hitting break',
+    'No ++ or -- operators — use += 1 and -= 1',
+  ],
+  mindset:'while True + break is the idiomatic Python do-while pattern. It reads clearly: "keep going until a condition inside stops you."',
+  mistake:'The #1 while loop bug in Python: forgetting to increment the counter. Python has no i++. Write i += 1 explicitly or your loop runs forever.',
+  challenge:'Count from 1 upward using a while loop. Stop when you reach the first number divisible by both 3 and 7. Print that number.',
+  hint:'Use while True: with if n % 3 == 0 and n % 7 == 0: break',
+  answer:`n = 1
+while True:
+    if n % 3 == 0 and n % 7 == 0:
+        print(f"First number divisible by 3 and 7: {n}")
+        break
+    n += 1`,
+},
+{
+  id:12,title:'match/case vs switch/case',tag:'Intermediate',
+  desc:'Python 3.10+ pattern matching — more powerful than C++ switch',
+  goal:'Replace C++ switch/case with Python match/case. Understand the critical difference: no fall-through, no break needed.',
+  cpp:`int day = 3;
+switch (day) {
+    case 1: cout << "Mon"; break;
+    case 2: cout << "Tue"; break;
+    case 3: cout << "Wed"; break;
+    default: cout << "Other"; break;
+}`,
+  py:`day = 3
+match day:
+    case 1:
+        print("Mon")
+    case 2:
+        print("Tue")
+    case 3:
+        print("Wed")
+    case _:          # default — underscore is the wildcard
+        print("Other")
+
+# Multiple values per case (like fallthrough without the bug)
+match day:
+    case 1 | 2 | 3 | 4 | 5:
+        print("Weekday")
+    case 6 | 7:
+        print("Weekend")
+    case _:
+        print("Invalid")`,
+  diffs:[
+    'No break needed — Python match cases never fall through',
+    '_ is the wildcard/default case',
+    'Use | to match multiple values in one case: case 1 | 2 | 3:',
+    'match is a soft keyword — variables named "match" still work',
+    'Requires Python 3.10 or newer',
+  ],
+  mindset:'Python match/case is deliberately fall-through-free. Every C++ switch bug caused by a missing break is impossible here. Think of each case as self-contained.',
+  mistake:'Writing break after a case block — it is not needed and will actually raise a SyntaxError in Python match (break only belongs inside loops). There is no fall-through to prevent.',
+  challenge:'Read a number 1–7 from the user. Use match/case to print the day name (1 → Monday … 7 → Sunday). Use _ for invalid input.',
+  hint:'match n: then case 1: print("Monday") and so on. case _: print("Invalid")',
+  answer:`n = int(input("Enter 1-7: "))
+match n:
+    case 1: print("Monday")
+    case 2: print("Tuesday")
+    case 3: print("Wednesday")
+    case 4: print("Thursday")
+    case 5: print("Friday")
+    case 6: print("Saturday")
+    case 7: print("Sunday")
+    case _: print("Invalid — enter 1 to 7")`,
+},
+{
+  id:13,title:'Functions',tag:'Intermediate',
+  desc:'Defining and calling functions — simpler and more flexible than C++',
+  goal:'Write Python functions with def. Understand default args, multiple return values, and keyword arguments.',
+  cpp:`// Return type must be declared
+int add(int a, int b) {
+    return a + b;
+}
+
+// Default args
+void greet(std::string name = "World") {
+    cout << "Hello, " << name;
+}
+
+// Multiple return → struct or pair
+std::pair<int,int> minmax(std::vector<int> v);`,
+  py:`# No return type needed — just def
+def add(a, b):
+    return a + b
+
+# Default arguments
+def greet(name="World"):
+    print(f"Hello, {name}")
+
+# Multiple return values (Python packs them as a tuple)
+def min_max(lst):
+    return min(lst), max(lst)
+
+lo, hi = min_max([3, 1, 4, 1, 5])  # tuple unpacking
+
+# Keyword arguments by name
+def power(base, exponent=2):
+    return base ** exponent
+
+power(3)              # 9  (exponent defaults to 2)
+power(3, exponent=3)  # 27`,
+  diffs:[
+    'No return type declaration — Python uses duck typing',
+    'Functions are first-class objects — pass them as arguments, store in variables',
+    'Multiple return values work as a tuple automatically',
+    'Keyword arguments let callers name parameters: power(base=3, exponent=4)',
+    '*args and **kwargs enable variadic functions (similar to C variadic macros)',
+  ],
+  mindset:'Functions in Python are objects just like int or str. You can store them in a list, pass them to another function, or return them. This unlocks powerful patterns you cannot do easily in C++.',
+  mistake:'Mutable default arguments are a famous Python trap: def append(lst=[]): — this list is shared across ALL calls! Use def append(lst=None): then lst = lst or [] inside the body.',
+  challenge:'Write a function stats(lst) that takes a list of numbers and returns a tuple of (total, average, maximum). Call it with [4, 7, 2, 9, 1, 5] and unpack and print the three results.',
+  hint:'return sum(lst), sum(lst)/len(lst), max(lst)  — Python packs these into a tuple automatically',
+  answer:`def stats(lst):
+    return sum(lst), sum(lst) / len(lst), max(lst)
+
+numbers = [4, 7, 2, 9, 1, 5]
+total, avg, maximum = stats(numbers)
+print(f"Sum: {total}, Avg: {avg:.2f}, Max: {maximum}")`,
+},
+{
+  id:14,title:'Lists vs Arrays',tag:'Intermediate',
+  desc:'Python lists are dynamic, mixed-type, and built-in',
+  goal:'Replace std::vector with Python lists. Learn indexing, slicing, and list comprehensions.',
+  cpp:`#include <vector>
+std::vector<int> nums = {1, 2, 3};
+nums.push_back(4);
+nums.pop_back();
+nums.size();
+nums[0];
+nums.insert(nums.begin()+1, 99);
+
+// Fixed-size array
+int arr[5] = {0};`,
+  py:`nums = [1, 2, 3]       # no type, no size
+nums.append(4)         # push_back
+nums.pop()             # pop_back (removes last)
+len(nums)              # size()
+nums[0]                # first element
+nums[-1]               # last element (no equivalent in C++!)
+nums[1:3]              # slice → [2, 3]
+nums.insert(1, 99)     # insert at index 1
+
+# Sort
+nums.sort()            # in-place, like std::sort
+sorted_copy = sorted(nums)  # returns new list
+
+# List comprehension — replaces most filter/transform loops
+squares = [x**2 for x in range(1, 6)]  # [1, 4, 9, 16, 25]
+evens   = [x for x in nums if x % 2 == 0]`,
+  diffs:[
+    'Python lists are dynamic — no fixed size, no type restriction',
+    'Lists can hold mixed types: [1, "hello", 3.14, True]',
+    'Negative indexing: lst[-1] is the last element, lst[-2] is second to last',
+    'Slicing: lst[start:stop:step] — stop is exclusive',
+    'List comprehensions replace most filter and transform loops',
+  ],
+  mindset:'List comprehensions are one of Python\'s best features. [x*2 for x in nums if x > 0] replaces a five-line loop. Once you learn the pattern you will use it constantly.',
+  mistake:'lst[len(lst)] raises IndexError — the last valid index is len(lst)-1. Use lst[-1] instead. Python slices never raise IndexError even for out-of-range stops.',
+  challenge:'Create a list of integers 1–10. Use a list comprehension to build a new list containing only the even numbers, each squared. Print the result.',
+  hint:'[x**2 for x in numbers if x % 2 == 0]',
+  answer:`numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+even_squares = [x**2 for x in numbers if x % 2 == 0]
+print(even_squares)  # [4, 16, 36, 64, 100]`,
+},
+{
+  id:15,title:'Strings',tag:'Intermediate',
+  desc:'Strings in Python — immutable, slice-able, method-rich',
+  goal:'Use Python string methods as a direct replacement for std::string operations. Master slicing and f-string formatting.',
+  cpp:`std::string s = "hello";
+s.length();         // 5
+s[0];               // 'h'
+s.substr(1, 3);     // "ell"
+s.find("ll");       // 2
+s += " world";
+std::toupper(s[0]);`,
+  py:`s = "hello"
+len(s)               # 5
+s[0]                 # 'h'
+s[1:4]               # "ell"  — slicing (start:stop, stop exclusive)
+s.find("ll")         # 2
+s + " world"         # "hello world" (creates a new string)
+s.upper()            # "HELLO"
+s.lower()            # "hello"
+s.strip()            # removes leading/trailing whitespace
+s.replace("l","r")   # "herro"
+s.split(" ")         # splits into list by delimiter
+" ".join(["a","b"])  # "a b" — joins list into string`,
+  diffs:[
+    'Strings are immutable — s[0] = "H" raises TypeError; create a new string instead',
+    'Slicing works identically to list slicing: s[1:4] gives characters 1,2,3',
+    'Rich method set: .upper(), .lower(), .strip(), .replace(), .startswith(), .endswith()',
+    'Triple quotes for multi-line strings: """line1\\nline2"""',
+    'No separate char type — individual characters are strings of length 1',
+  ],
+  mindset:'Python strings are immutable character sequences. Embrace .split() and .join() — they replace most C++ character-by-character string loops.',
+  mistake:'Trying to modify in place: s[0] = "H" raises TypeError. You must build a new string: s = "H" + s[1:]  or use s.replace("h","H").',
+  challenge:'Given the sentence "Python is faster to write than C++", split it into words, count the words, then print the sentence reversed word-by-word.',
+  hint:'words = sentence.split()  then  " ".join(reversed(words))',
+  answer:`sentence = "Python is faster to write than C++"
+words = sentence.split()
+print(f"Word count: {len(words)}")
+reversed_sentence = " ".join(reversed(words))
+print(f"Reversed: {reversed_sentence}")`,
+},
+{
+  id:16,title:'Dictionaries vs Maps',tag:'Intermediate',
+  desc:'Python dicts are built-in, flexible, and more ergonomic than std::map',
+  goal:'Use Python dicts as a direct replacement for std::map. Learn safe access with .get(), and dict comprehensions.',
+  cpp:`#include <map>
+std::map<std::string, int> scores;
+scores["Alice"] = 95;
+scores["Bob"] = 87;
+scores.count("Alice"); // 0 or 1 (key exists?)
+scores.erase("Bob");
+
+for (auto& [key, val] : scores) {
+    cout << key << ": " << val;
+}`,
+  py:`scores = {"Alice": 95, "Bob": 87}
+scores["Alice"]              # 95
+scores["Charlie"] = 72       # add new key
+scores.get("Dave", 0)        # safe access — returns 0 if key missing
+del scores["Bob"]            # erase
+"Alice" in scores            # True — membership check
+
+for key, val in scores.items():
+    print(f"{key}: {val}")
+
+# Dict comprehension
+doubled = {k: v * 2 for k, v in scores.items()}`,
+  diffs:[
+    'No #include, no template syntax — dicts are a built-in type',
+    '.get(key, default) is the safe alternative to operator[] for possibly-missing keys',
+    '"in" checks key membership — replaces .count() == 1',
+    'Dict comprehension: {k: v for k, v in pairs} mirrors list comprehension syntax',
+    'Ordered by insertion since Python 3.7 (unlike std::map which orders by key)',
+  ],
+  mindset:'Dicts are Python\'s swiss army knife — JSON data, function keyword arguments, counters, graphs. The more Python you write, the more dicts you use.',
+  mistake:'Accessing a missing key with scores["Dave"] raises KeyError — same as map::at() in C++. Always use .get("Dave", 0) when the key might not exist.',
+  challenge:'Given a list of words, build a frequency counter dictionary that maps each word to how many times it appears. Print the result.',
+  hint:'freq[word] = freq.get(word, 0) + 1',
+  answer:`words = ["the", "cat", "sat", "on", "the", "mat", "the"]
+freq = {}
+for word in words:
+    freq[word] = freq.get(word, 0) + 1
+print(freq)  # {"the": 3, "cat": 1, "sat": 1, "on": 1, "mat": 1}`,
+},
+{
+  id:17,title:'Nested Loops',tag:'Intermediate',
+  desc:'Nested loops and 2D list-of-lists structures',
+  goal:'Use nested for loops and list-of-lists to replace C++ 2D arrays. Learn the nested list comprehension.',
+  cpp:`// 2D array
+int matrix[3][3] = {{1,2,3},{4,5,6},{7,8,9}};
+for (int i = 0; i < 3; i++) {
+    for (int j = 0; j < 3; j++) {
+        cout << matrix[i][j] << " ";
+    }
+    cout << endl;
+}`,
+  py:`# List of lists — Python's 2D array
+matrix = [[1,2,3],[4,5,6],[7,8,9]]
+
+# Iterate rows then values
+for row in matrix:
+    for val in row:
+        print(val, end=" ")
+    print()  # newline after each row
+
+# Access a specific cell
+matrix[1][2]   # row 1, column 2 → 6
+
+# Flatten with nested comprehension
+flat = [val for row in matrix for val in row]
+# [1, 2, 3, 4, 5, 6, 7, 8, 9]`,
+  diffs:[
+    'Python uses list-of-lists — no native 2D array type',
+    'Access syntax is matrix[row][col] — same as C++',
+    'Rows can have different lengths (jagged arrays are allowed)',
+    'Nested list comprehensions can flatten or transform 2D structures',
+  ],
+  mindset:'For serious matrix math (image processing, simulations), use NumPy. For everyday 2D logic in a script, list-of-lists works fine.',
+  mistake:'matrix[i,j] does NOT work for Python lists — it raises TypeError. Always use matrix[i][j]. (matrix[i,j] is NumPy syntax only.)',
+  challenge:'Print a 5×5 multiplication table using nested for loops. Format each number to occupy 3 characters wide so columns align.',
+  hint:'print(f"{i*j:3}", end=" ")  — :3 pads to width 3',
+  answer:`for i in range(1, 6):
+    for j in range(1, 6):
+        print(f"{i*j:3}", end=" ")
+    print()`,
+},
+{
+  id:18,title:'Problem Solving Patterns',tag:'Advanced',
+  desc:'Built-in functions and Pythonic idioms that replace manual loops',
+  goal:'Stop writing loops where Python has a built-in. Learn max(), min(), sum(), sorted(), any(), all(), and generator expressions.',
+  cpp:`// Find max — manual loop
+int max_val = INT_MIN;
+for (int x : v) if (x > max_val) max_val = x;
+
+// Filter
+std::vector<int> evens;
+for (int x : v) if (x%2==0) evens.push_back(x);
+
+// Transform with lambda
+std::transform(v.begin(), v.end(), out.begin(),
+    [](int x){ return x*2; });`,
+  py:`v = [3, 1, 4, 1, 5, 9, 2, 6]
+
+# Built-ins replace manual loops entirely
+max_val = max(v)          # no loop needed
+min_val = min(v)
+total   = sum(v)
+
+# Filter with list comprehension
+evens = [x for x in v if x % 2 == 0]
+
+# Transform with list comprehension
+doubled = [x * 2 for x in v]
+
+# Sort by custom key
+words = ["banana", "apple", "cherry"]
+words.sort(key=len)       # sort by string length
+
+# Count with condition — generator expression
+count = sum(1 for x in v if x > 4)
+
+# any() / all() — no manual loop needed
+all_positive = all(x > 0 for x in v)
+has_negative = any(x < 0 for x in v)`,
+  diffs:[
+    'max(), min(), sum(), len(), sorted() are built-in — no #include needed',
+    'List comprehensions replace filter and transform in one readable line',
+    'sorted(key=...) accepts any function as a sort key — very powerful',
+    'Generator expressions like sum(x**2 for x in v) are memory-efficient',
+    'any() and all() replace common loop-with-flag patterns',
+  ],
+  mindset:'Python has batteries included. Before writing a loop, ask: is there a built-in for this? max, min, sum, any, all, zip, enumerate, sorted, reversed — learn all of them.',
+  mistake:'Using sort() when you need sorted(). sort() modifies the list in place and returns None. sorted() leaves the original unchanged and returns a new list.',
+  challenge:'Given a list of (name, score) tuples, use max() with a key function to find the top scorer and print their name and score.',
+  hint:'max(students, key=lambda s: s[1])  — lambda picks the score from each tuple',
+  answer:`students = [("Saad", 92), ("Ali", 88), ("Omar", 95), ("Noor", 85)]
+top = max(students, key=lambda s: s[1])
+print(f"Top scorer: {top[0]} with {top[1]} points")`,
+},
+{
+  id:19,title:'Classes — Basics',tag:'Advanced',
+  desc:'Object-oriented programming — Python style',
+  goal:'Write a Python class with __init__, instance attributes, and methods. Understand why self is always explicit.',
+  cpp:`class Car {
+private:
+    std::string brand;
+    int speed;
+
+public:
+    Car(std::string b, int s)
+        : brand(b), speed(s) {}
+
+    void accelerate(int amount) {
+        speed += amount;
+    }
+    std::string getBrand() {
+        return brand;
+    }
+};
+
+Car myCar("Toyota", 0);
+myCar.accelerate(50);`,
+  py:`class Car:
+    def __init__(self, brand, speed=0):
+        self.brand = brand    # public by default
+        self.speed = speed
+        self._fuel = 100      # _ prefix = private by convention
+
+    def accelerate(self, amount):
+        self.speed += amount
+
+    def __str__(self):        # like operator<< or toString()
+        return f"Car({self.brand}, {self.speed} km/h)"
+
+my_car = Car("Toyota")        # speed defaults to 0
+my_car.accelerate(50)
+print(my_car)                 # Car(Toyota, 50 km/h)`,
+  diffs:[
+    '__init__ is the constructor — double underscores are called "dunder" (double-underscore)',
+    'self is the explicit equivalent of C++\'s implicit this — must be the first parameter of every method',
+    'No public/private keywords — _name means "treat as private by convention"',
+    '__str__ is the equivalent of operator<< or toString() — used by print()',
+    '@property decorator creates a getter that is accessed as an attribute (no parentheses)',
+  ],
+  mindset:'Python classes trust the programmer. There is no compiler-enforced access control — just convention. _name means private. This feels loose at first but keeps the syntax clean.',
+  mistake:'The #1 Python class bug: forgetting self as the first parameter. When you call obj.method(x), Python automatically passes obj as self. If your def is missing self, it receives obj where it expects nothing and raises TypeError.',
+  challenge:'Write a BankAccount class with owner, balance. Add deposit(amount) and withdraw(amount) methods. withdraw should print "Insufficient funds" and do nothing if balance would go negative.',
+  hint:'def withdraw(self, amount): if amount <= self.balance: self.balance -= amount',
+  answer:`class BankAccount:
+    def __init__(self, owner, balance=0):
+        self.owner = owner
+        self.balance = balance
+
+    def deposit(self, amount):
+        self.balance += amount
+        print(f"Deposited {amount}. Balance: {self.balance}")
+
+    def withdraw(self, amount):
+        if amount <= self.balance:
+            self.balance -= amount
+            print(f"Withdrew {amount}. Balance: {self.balance}")
+        else:
+            print("Insufficient funds!")
+
+acc = BankAccount("Saad", 1000)
+acc.deposit(500)
+acc.withdraw(200)
+acc.withdraw(2000)`,
+},
+{
+  id:20,title:'References vs Pointers',tag:'Advanced',
+  desc:'Python has no pointers — variables are labels, objects live on the heap',
+  goal:'Understand Python\'s reference model. Know when assignment creates an alias vs. a copy, and how to copy deliberately.',
+  cpp:`// Pointer
+int x = 5;
+int* ptr = &x;
+*ptr = 10;  // modifies x through pointer
+
+// Reference
+int& ref = x;
+ref = 20;  // same effect
+
+// Pass by value vs reference
+void modify(int& arr) { arr = 99; }  // changes original
+void copy(int arr) { arr = 99; }     // no effect outside`,
+  py:`# Python has NO pointers, NO &, NO *
+# Variables are labels (names) that bind to objects
+
+x = [1, 2, 3]
+y = x          # y is ANOTHER LABEL for the SAME list object
+y.append(4)    # modifies the shared list
+print(x)       # [1, 2, 3, 4]  ← x also changed!
+
+# To get an independent copy:
+z = x.copy()   # shallow copy
+z.append(99)   # x is NOT affected
+print(x)       # [1, 2, 3, 4]  ← unchanged
+
+# Immutable types behave like value types
+a = 5
+b = a
+b = 10         # rebinds b — does NOT change a
+print(a)       # 5
+
+# Check identity (same as pointer comparison in C++)
+print(x is y)  # True before the copy was made`,
+  diffs:[
+    'No pointer syntax — no &, *, ->, or dereference operators',
+    'Mutable types (list, dict) assigned with = share the same object — aliasing',
+    'Immutable types (int, str, tuple) effectively behave like value types',
+    'Use .copy() or list(x) for a shallow copy; copy.deepcopy() for nested structures',
+    'No delete/free — Python\'s garbage collector manages memory automatically',
+  ],
+  mindset:'Think of Python variables as sticky labels. y = x sticks a second label on the same object — it does NOT copy the object. For mutable types, you must copy explicitly if you want independence.',
+  mistake:'The most common Python surprise for C++ developers: y = x on a list then modifying y and being shocked that x changed. Always use y = x.copy() when you need a separate list.',
+  challenge:'Demonstrate aliasing: create a list, assign it to a second variable, modify the second, and show both changed. Then fix it with .copy() and show they are now independent.',
+  hint:'Use print(a is b) to confirm two names point to the same object',
+  answer:`# Aliasing — both names see the same list
+original = [1, 2, 3]
+alias = original
+alias.append(4)
+print(original)           # [1, 2, 3, 4]  — changed!
+print(original is alias)  # True
+
+# Fix with copy
+independent = original.copy()
+independent.append(99)
+print(original)              # [1, 2, 3, 4]  — unchanged
+print(original is independent)  # False`,
+},
+];
+
+const DAILY_CHALLENGES = [
+  {title:'Variable Swap',desc:'In C++ you need a temp variable to swap. In Python, swap two variables in one line.',hint:'x, y = y, x',answer:'a = 5\nb = 10\na, b = b, a\nprint(a, b)  # 10 5'},
+  {title:'List Reversal',desc:'Reverse a list in Python without using a loop — use slicing.',hint:'lst[::-1]',answer:'nums = [1,2,3,4,5]\nprint(nums[::-1])'},
+  {title:'Count Vowels',desc:'Count the number of vowels in a string using a list comprehension or sum().',hint:'sum(1 for c in s if c.lower() in "aeiou")',answer:'s = "Engineering"\ncount = sum(1 for c in s if c.lower() in "aeiou")\nprint(count)'},
+  {title:'FizzBuzz',desc:'Print numbers 1-20. For multiples of 3 print "Fizz", multiples of 5 print "Buzz", both print "FizzBuzz".',hint:'Use if/elif/else inside a for loop',answer:'for i in range(1,21):\n    if i%15==0: print("FizzBuzz")\n    elif i%3==0: print("Fizz")\n    elif i%5==0: print("Buzz")\n    else: print(i)'},
+  {title:'Dict from Lists',desc:'Given two lists (keys and values), create a dictionary in one line using zip().',hint:'dict(zip(keys, values))',answer:'keys = ["a","b","c"]\nvals = [1,2,3]\nd = dict(zip(keys, vals))\nprint(d)'},
+  {title:'Palindrome Check',desc:'Check if a string is a palindrome using slicing (no loop needed).',hint:'s == s[::-1]',answer:'s = "racecar"\nprint(s == s[::-1])'},
+  {title:'Flatten a List',desc:'Flatten [[1,2],[3,4],[5,6]] into [1,2,3,4,5,6] using a list comprehension.',hint:'[x for row in matrix for x in row]',answer:'matrix = [[1,2],[3,4],[5,6]]\nflat = [x for row in matrix for x in row]\nprint(flat)'},
+];
+
+const PRACTICE_QUESTIONS = [
+  {type:'convert',title:'Convert C++ to Python',cpp:`int result = 0;
+for (int i = 1; i <= 10; i++) {
+    result += i;
+}
+cout << result;`,answer:`result = 0
+for i in range(1, 11):
+    result += i
+print(result)`,hint:'Use range(1, 11) and accumulate',explanation:'No int declaration, no semicolons, range() replaces the three-part for loop'},
+  {type:'fill',title:'Fill in the Blank',question:'Fill in Python code to check if a number is prime:',template:`def is_prime(n):
+    if n < 2:
+        return False
+    for i in range(2, ___):  # Fill in
+        if n % i == 0:
+            return False
+    return True`,answer:`def is_prime(n):
+    if n < 2:
+        return False
+    for i in range(2, int(n**0.5)+1):
+        if n % i == 0:
+            return False
+    return True`,hint:'Only check up to sqrt(n) — use int(n**0.5)+1',explanation:'int(n**0.5)+1 is the Python equivalent of sqrt(n)+1 from cmath'},
+  {type:'predict',title:'Predict the Output',code:`a = [1, 2, 3]
+b = a
+b += [4]
+print(a)`,answer:'[1, 2, 3, 4]',hint:'b = a makes b an alias for the same list',explanation:'b += [4] modifies the list in place, and a points to the same list, so a also changes'},
+  {type:'bugfix',title:'Fix the Bug',buggy:`def square_evens(lst):
+    result = []
+    for i in lst:
+        if i % 2 = 0:  # Bug here
+            result.append(i**2)
+    return result`,answer:`def square_evens(lst):
+    result = []
+    for i in lst:
+        if i % 2 == 0:  # Fixed: == not =
+            result.append(i**2)
+    return result`,hint:'Python uses == for comparison just like C++',explanation:'= is assignment, == is comparison. Using = inside an if causes SyntaxError'},
+  {type:'convert',title:'Convert C++ to Python',cpp:`std::vector<int> nums = {5,3,8,1,9,2};
+std::sort(nums.begin(), nums.end());
+for (auto x : nums) cout << x << " ";`,answer:`nums = [5,3,8,1,9,2]
+nums.sort()
+for x in nums:
+    print(x, end=" ")`,hint:'Python sort is nums.sort() and for loops are for x in nums',explanation:'No iterators needed, no begin()/end(). Python list.sort() is in-place like std::sort'},
+  {type:'write',title:'Write a Function',question:'Write a Python function that takes a list of numbers and returns a dict with keys "min", "max", "sum", "avg".',answer:`def stats(lst):
+    return {
+        "min": min(lst),
+        "max": max(lst),
+        "sum": sum(lst),
+        "avg": sum(lst)/len(lst)
+    }
+
+result = stats([4, 7, 2, 9, 1])
+print(result)`,hint:'Return a dictionary literal using min(), max(), sum()',explanation:'Python built-ins make this trivial. A C++ version would need loops or algorithm headers'},
+];
+
+// ════════════════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════════════════
+
+let STATE = {
+  theme: 'light',
+  xp: 0,
+  level: 1,
+  streak: 0,
+  lastActiveDate: '',
+  completedLessons: [],
+  completedChallenges: [],
+  unlockedBadges: [],
+  practiceCompleted: 0,
+  dailyCompletedDates: [],
+  weeklyXP: [0,0,0,0,0,0,0],
+  activityLog: [],
+  settings: {
+    sound: true,
+    animations: true,
+    dailyGoal: 2,
+  },
+};
+
+function loadState() {
+  try {
+    const s = localStorage.getItem(STORAGE_KEY);
+    if (s) STATE = Object.assign(STATE, JSON.parse(s));
+  } catch(e) {}
+}
+
+function saveState() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(STATE));
+  } catch(e) {}
+}
+
+function today() {
+  return new Date().toISOString().split('T')[0];
+}
+
+// ════════════════════════════════════════════════════
+// XP / LEVEL
+// ════════════════════════════════════════════════════
+
+function addXP(amount) {
+  STATE.xp += amount;
+  const newLevel = Math.floor(STATE.xp / 200) + 1;
+  if (newLevel > STATE.level) {
+    STATE.level = newLevel;
+    toast(`🎉 Level Up! You're now Level ${STATE.level} — ${LEVEL_NAMES[Math.min(STATE.level-1, LEVEL_NAMES.length-1)]}`, 4000);
+  }
+  saveState();
+  updateNav();
+}
+
+function updateNav() {
+  document.getElementById('nav-streak').textContent = `🔥 ${STATE.streak}`;
+  document.getElementById('nav-xp').textContent = `⚡ ${STATE.xp} XP`;
+  document.getElementById('theme-btn').textContent = document.body.classList.contains('dark') ? '☀️' : '🌙';
+}
+
+// ════════════════════════════════════════════════════
+// STREAK
+// ════════════════════════════════════════════════════
+
+function updateStreak() {
+  const t = today();
+  if (STATE.lastActiveDate === t) return;
+
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  const yd = yesterday.toISOString().split('T')[0];
+
+  if (STATE.lastActiveDate === yd) {
+    STATE.streak++;
+  } else if (STATE.lastActiveDate !== t) {
+    STATE.streak = 1;
+  }
+  STATE.lastActiveDate = t;
+
+  // Log activity
+  if (!STATE.activityLog.includes(t)) STATE.activityLog.push(t);
+
+  // Weekly XP tracking
+  const dayOfWeek = new Date().getDay();
+  if (!STATE.weeklyXP) STATE.weeklyXP = [0,0,0,0,0,0,0];
+
+  checkBadges();
+  saveState();
+}
+
+// ════════════════════════════════════════════════════
+// BADGES
+// ════════════════════════════════════════════════════
+
+function checkBadges() {
+  const unlock = (id) => {
+    if (!STATE.unlockedBadges.includes(id)) {
+      STATE.unlockedBadges.push(id);
+      const b = ACHIEVEMENTS.find(a => a.id === id);
+      if (b) toast(`${b.icon} Badge Unlocked: ${b.name}!`, 3500);
+    }
+  };
+
+  if (STATE.completedLessons.length >= 1) unlock('first_lesson');
+  if (STATE.streak >= 3) unlock('streak3');
+  if (STATE.streak >= 7) unlock('streak7');
+  if (STATE.streak >= 30) unlock('streak30');
+  if (STATE.completedLessons.length >= 5) unlock('lessons5');
+  if (STATE.completedLessons.length >= 10) unlock('lessons10');
+  if (STATE.completedLessons.length >= 20) unlock('lessons20');
+  if (STATE.dailyCompletedDates.length >= 1) unlock('daily1');
+  if (STATE.dailyCompletedDates.length >= 7) unlock('daily7');
+  if (STATE.practiceCompleted >= 10) unlock('practice10');
+
+  // Topic badges
+  const controlFlowLessons = [6,7,8,9,10,11,12];
+  if (controlFlowLessons.every(id => STATE.completedLessons.includes(id))) unlock('control_flow');
+  if (STATE.completedLessons.includes(13)) unlock('functions');
+  if (STATE.completedLessons.includes(14) && STATE.completedLessons.includes(16)) unlock('data_struct');
+}
+
+// ════════════════════════════════════════════════════
+// NAVIGATION
+// ════════════════════════════════════════════════════
+
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+
+  document.getElementById('page-' + name).classList.add('active');
+  const tabs = document.querySelectorAll('.nav-tab');
+  const names = ['dashboard','lessons','practice','daily','analytics','badges','cheatsheet','settings'];
+  const idx = names.indexOf(name);
+  if (idx >= 0) tabs[idx].classList.add('active');
+
+  // Render page content
+  if (name === 'dashboard') renderDashboard();
+  if (name === 'lessons') renderLessons();
+  if (name === 'practice') renderPractice();
+  if (name === 'daily') renderDaily();
+  if (name === 'analytics') renderAnalytics();
+  if (name === 'badges') renderBadges();
+  if (name === 'cheatsheet') renderCheatSheet();
+  if (name === 'settings') renderSettings();
+}
+
+function toggleTheme() {
+  document.body.classList.toggle('dark');
+  STATE.theme = document.body.classList.contains('dark') ? 'dark' : 'light';
+  saveState();
+  updateNav();
+}
+
+// ════════════════════════════════════════════════════
+// TOAST
+// ════════════════════════════════════════════════════
+
+let toastTimer;
+function toast(msg, dur=2500) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), dur);
+}
+
+// ════════════════════════════════════════════════════
+// DASHBOARD
+// ════════════════════════════════════════════════════
+
+function renderDashboard() {
+  document.getElementById('hero-streak').textContent = STATE.streak;
+  document.getElementById('hero-xp').textContent = STATE.xp;
+
+  const done = STATE.completedLessons.length;
+  const total = LESSONS_DATA.length;
+  document.getElementById('stat-lessons').textContent = `${done} / ${total}`;
+  document.getElementById('stat-progress').style.width = `${(done/total)*100}%`;
+  document.getElementById('stat-level').textContent = STATE.level;
+  document.getElementById('stat-level-name').textContent = LEVEL_NAMES[Math.min(STATE.level-1, LEVEL_NAMES.length-1)];
+  document.getElementById('stat-challenges').textContent = STATE.dailyCompletedDates.length;
+  document.getElementById('stat-badges').textContent = `${STATE.unlockedBadges.length} / ${ACHIEVEMENTS.length}`;
+
+  // Daily
+  const dc = getDailyChallenge();
+  document.getElementById('dash-daily-title').textContent = dc.title;
+  document.getElementById('dash-daily-desc').textContent = dc.desc;
+  const isDone = STATE.dailyCompletedDates.includes(today());
+  document.getElementById('dash-daily-done').style.display = isDone ? 'block' : 'none';
+
+  // Next lesson
+  let nextId = 1;
+  for (let i = 1; i <= total; i++) {
+    if (!STATE.completedLessons.includes(i)) { nextId = i; break; }
+  }
+  if (done === total) nextId = total;
+  const nl = LESSONS_DATA.find(l => l.id === nextId);
+  if (nl) {
+    document.getElementById('next-lesson-title').textContent = `Lesson ${nl.id}: ${nl.title}`;
+    document.getElementById('next-lesson-desc').textContent = nl.desc;
+    document.getElementById('next-lesson-prog').style.width = `${(done/total)*100}%`;
+  }
+
+  // Weekly chart
+  const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const today_day = new Date().getDay();
+  const chart = document.getElementById('weekly-chart');
+  chart.innerHTML = '';
+  const wXP = STATE.weeklyXP || [0,0,0,0,0,0,0];
+  const maxXP = Math.max(...wXP, 1);
+  for (let i = 0; i < 7; i++) {
+    const col = document.createElement('div');
+    col.className = 'bar-col';
+    const h = Math.max((wXP[i]/maxXP)*100, 4);
+    col.innerHTML = `<div class="bar" style="height:${h}px" title="${wXP[i]} XP"></div><div class="bar-label">${days[(today_day - 6 + i + 7) % 7]}</div>`;
+    chart.appendChild(col);
+  }
+
+  // Activity grid
+  const ag = document.getElementById('activity-grid');
+  ag.innerHTML = '';
+  const t = today();
+  for (let i = 27; i >= 0; i--) {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    const ds = d.toISOString().split('T')[0];
+    const dot = document.createElement('div');
+    const isToday = ds === t;
+    const active = STATE.activityLog && STATE.activityLog.includes(ds);
+    dot.className = 'activity-dot' + (isToday ? ' today' : (active ? ' done' : ''));
+    dot.title = ds;
+    ag.appendChild(dot);
+  }
+
+  // Recent activity
+  const ra = document.getElementById('recent-activity');
+  const events = [];
+  STATE.completedLessons.slice(-5).reverse().forEach(id => {
+    const l = LESSONS_DATA.find(x => x.id === id);
+    if (l) events.push(`📚 Completed Lesson ${id}: ${l.title}`);
+  });
+  STATE.dailyCompletedDates.slice(-3).reverse().forEach(d => {
+    events.push(`🎯 Daily challenge completed on ${d}`);
+  });
+  if (events.length === 0) {
+    ra.innerHTML = '<div style="color:var(--text3);font-size:13px">No activity yet. Start your first lesson!</div>';
+  } else {
+    ra.innerHTML = events.slice(0,6).map(e =>
+      `<div style="padding:10px 14px;border-bottom:1px solid var(--border);font-size:13px">${e}</div>`
+    ).join('');
+  }
+}
+
+function continueLearning() {
+  showPage('lessons');
+  // Find next incomplete
+  for (const l of LESSONS_DATA) {
+    if (!STATE.completedLessons.includes(l.id)) {
+      setTimeout(() => openLesson(l.id), 100);
+      return;
+    }
+  }
+  openLesson(LESSONS_DATA[LESSONS_DATA.length-1].id);
+}
+
+// ════════════════════════════════════════════════════
+// LESSONS
+// ════════════════════════════════════════════════════
+
+function renderLessons() {
+  document.getElementById('lesson-list-view').style.display = 'block';
+  document.getElementById('lesson-detail-view').style.display = 'none';
+  const container = document.getElementById('lessons-list');
+  container.innerHTML = '';
+  LESSONS_DATA.forEach((l, i) => {
+    const done = STATE.completedLessons.includes(l.id);
+    const locked = i > 0 && !STATE.completedLessons.includes(LESSONS_DATA[i-1].id);
+    const isNext = !done && !locked;
+    const card = document.createElement('div');
+    card.className = `lesson-card${done?' completed':''}${locked?' locked':''}`;
+    card.innerHTML = `
+      <div class="lesson-num ${done?'completed':isNext?'active':''}">${done?'✓':l.id}</div>
+      <div class="lesson-info">
+        <div class="lesson-title">${l.title}</div>
+        <div class="lesson-desc">${l.desc}</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <span class="chip ${l.tag==='Beginner'?'chip-green':l.tag==='Intermediate'?'chip-accent':'chip-red'}">${l.tag}</span>
+        ${done ? '<span class="chip chip-green">✓ Done</span>' : ''}
+        ${locked ? '<span class="chip" style="background:var(--surface3);color:var(--text3)">🔒 Locked</span>' : ''}
+        ${isNext ? '<span class="chip chip-accent">Up next →</span>' : ''}
+      </div>
+    `;
+    if (!locked) card.onclick = () => openLesson(l.id);
+    container.appendChild(card);
+  });
+}
+
+function openLesson(id) {
+  const l = LESSONS_DATA.find(x => x.id === id);
+  if (!l) return;
+
+  document.getElementById('lesson-list-view').style.display = 'none';
+  document.getElementById('lesson-detail-view').style.display = 'block';
+
+  const done = STATE.completedLessons.includes(id);
+  const nextLesson = id < LESSONS_DATA.length ? LESSONS_DATA.find(x => x.id === id + 1) : null;
+  const isNextLocked = !done;
+
+  document.getElementById('lesson-content').innerHTML = `
+    <!-- LESSON HEADER -->
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;flex-wrap:wrap">
+      <h2 style="font-size:22px;font-weight:700">Lesson ${l.id}: ${l.title}</h2>
+      <span class="chip ${l.tag==='Beginner'?'chip-green':l.tag==='Intermediate'?'chip-accent':'chip-red'}">${l.tag}</span>
+      ${done ? '<span class="chip chip-green">✓ Completed</span>' : ''}
+    </div>
+    <div style="color:var(--text2);font-size:14px;margin-bottom:20px">${l.desc}</div>
+
+    <!-- LESSON GOAL -->
+    ${l.goal ? `
+    <div class="lesson-section">
+      <div class="lesson-section-title">🎓 What You Will Learn</div>
+      <div class="card card-sm" style="border-left:3px solid var(--amber);background:var(--amber-bg)">
+        <div style="font-size:13.5px;line-height:1.7;color:var(--text)">${l.goal}</div>
+      </div>
+    </div>` : ''}
+
+    <!-- CODE COMPARISON -->
+    <div class="lesson-section">
+      <div class="lesson-section-title">Code Comparison</div>
+      <div class="compare-grid">
+        <div class="compare-col">
+          <div class="compare-header cpp">⚙️ C++ — what you know</div>
+          <div class="compare-body">${escHtml(l.cpp)}</div>
+        </div>
+        <div class="compare-col">
+          <div class="compare-header py">🐍 Python — what to learn</div>
+          <div class="compare-body">${escHtml(l.py)}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- KEY DIFFERENCES -->
+    <div class="lesson-section">
+      <div class="lesson-section-title">Key Differences</div>
+      ${l.diffs.map(d => `<div class="diff-item">→ ${d}</div>`).join('')}
+    </div>
+
+    <!-- MINDSET -->
+    <div class="lesson-section">
+      <div class="lesson-section-title">🧠 Mindset Shift</div>
+      <div class="card card-sm" style="border-left:3px solid var(--accent2)">
+        <div style="font-size:13.5px;line-height:1.7">${l.mindset}</div>
+      </div>
+    </div>
+
+    <!-- COMMON MISTAKE -->
+    <div class="lesson-section">
+      <div class="lesson-section-title">⚠️ Common C++ → Python Mistake</div>
+      <div class="mistake-box">
+        <div style="font-size:13.5px;line-height:1.7">${l.mistake}</div>
+      </div>
+    </div>
+
+    <!-- MINI CHALLENGE -->
+    <div class="lesson-section">
+      <div class="challenge-box">
+        <div class="challenge-title">✏️ Mini Challenge</div>
+        <div style="font-size:14px;margin-bottom:16px;line-height:1.6">${l.challenge}</div>
+        <textarea class="practice-input" id="lesson-input-${id}" placeholder="Write your Python code here..." rows="5"></textarea>
+        <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap;align-items:center">
+          <button class="btn btn-secondary btn-sm" onclick="toggleHint(${id})">💡 Show Hint</button>
+          <button class="btn btn-secondary btn-sm" onclick="toggleAnswer(${id})">🔍 Show Answer</button>
+          ${!done
+            ? `<button class="btn btn-primary btn-sm" onclick="completeLesson(${id})">✓ Complete Lesson (+50 XP)</button>`
+            : '<span class="chip chip-green" style="padding:7px 13px;font-size:13px">✓ Lesson Completed</span>'
+          }
+        </div>
+        <div class="hint-box" id="hint-${id}">💡 <strong>Hint:</strong> ${l.hint}</div>
+        <div class="answer-box" id="answer-${id}">
+          <strong style="color:var(--green);font-size:12px;text-transform:uppercase;letter-spacing:0.06em">Sample Answer</strong>
+          <pre style="margin-top:8px;font-family:'JetBrains Mono',monospace;font-size:12.5px;line-height:1.6">${escHtml(l.answer)}</pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- NEXT LESSON BUTTON -->
+    ${nextLesson ? `
+    <div style="display:flex;justify-content:flex-end;margin-top:8px">
+      ${isNextLocked
+        ? `<div style="display:flex;align-items:center;gap:10px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);padding:10px 16px;font-size:13px;color:var(--text3)">
+             🔒 Complete this lesson to unlock: <strong style="color:var(--text2)">Lesson ${nextLesson.id}: ${nextLesson.title}</strong>
+           </div>`
+        : `<button class="btn btn-secondary btn-sm" onclick="openLesson(${id+1})">
+             Next: Lesson ${nextLesson.id} — ${nextLesson.title} →
+           </button>`
+      }
+    </div>` : `
+    <div style="background:var(--green-bg);border:1px solid rgba(46,125,50,0.2);border-radius:var(--r2);padding:16px;text-align:center;margin-top:8px">
+      <div style="font-size:20px;margin-bottom:6px">🎉</div>
+      <div style="font-weight:600;color:var(--green)">Course Complete!</div>
+      <div style="font-size:13px;color:var(--text2);margin-top:4px">You have finished all 20 lessons. Check your badges!</div>
+    </div>`}
+  `;
+}
+
+function backToLessons() {
+  document.getElementById('lesson-list-view').style.display = 'block';
+  document.getElementById('lesson-detail-view').style.display = 'none';
+  renderLessons();
+}
+
+function toggleHint(id) {
+  const el = document.getElementById(`hint-${id}`);
+  el.style.display = el.style.display === 'block' ? 'none' : 'block';
+}
+
+function toggleAnswer(id) {
+  const el = document.getElementById(`answer-${id}`);
+  el.style.display = el.style.display === 'block' ? 'none' : 'block';
+}
+
+function completeLesson(id) {
+  if (!STATE.completedLessons.includes(id)) {
+    STATE.completedLessons.push(id);
+    addXP(50);
+    updateStreak();
+    checkBadges();
+    saveState();
+    toast(`✅ Lesson ${id} complete! +50 XP earned`, 3000);
+    // Re-render lesson to show completed state
+    openLesson(id);
+  }
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ════════════════════════════════════════════════════
+// PRACTICE
+// ════════════════════════════════════════════════════
+
+function renderPractice() {
+  const container = document.getElementById('practice-container');
+  container.innerHTML = '';
+  PRACTICE_QUESTIONS.forEach((q, i) => {
+    const card = document.createElement('div');
+    card.className = 'practice-card';
+    card.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+        <span class="chip chip-accent">${q.type.toUpperCase()}</span>
+        <div class="practice-question" style="margin:0">${q.title}</div>
+      </div>
+      ${q.question ? `<div style="color:var(--text2);font-size:13px;margin-bottom:12px">${q.question}</div>` : ''}
+      ${q.cpp ? `<div style="margin-bottom:12px"><div class="code-label label-cpp">C++</div><div class="code-block">${escHtml(q.cpp)}</div></div>` : ''}
+      ${q.buggy ? `<div style="margin-bottom:12px"><div class="code-label label-cpp">Buggy Code</div><div class="code-block">${escHtml(q.buggy)}</div></div>` : ''}
+      ${q.code ? `<div style="margin-bottom:12px"><div class="code-label label-py">Python Code</div><div class="code-block">${escHtml(q.code)}</div></div>` : ''}
+      ${q.template ? `<div style="margin-bottom:12px"><div class="code-label label-py">Template</div><div class="code-block">${escHtml(q.template)}</div></div>` : ''}
+      <textarea class="practice-input" id="pq-${i}" placeholder="${q.type === 'predict' ? 'What is the output?' : 'Write your answer here...'}" rows="4"></textarea>
+      <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap">
+        <button class="btn btn-primary btn-sm" onclick="checkPractice(${i})">Check Answer</button>
+        <button class="btn btn-secondary btn-sm" onclick="showPracticeHint(${i})">💡 Hint</button>
+        <button class="btn btn-secondary btn-sm" onclick="revealPractice(${i})">Show Answer</button>
+      </div>
+      <div class="feedback-box" id="pf-${i}"></div>
+      <div class="hint-box" id="ph-${i}">💡 ${q.hint}</div>
+      <div class="answer-box" id="pa-${i}" style="display:none">
+        <strong style="color:var(--green);font-size:12px">ANSWER:</strong>
+        <pre style="margin-top:8px;font-family:'JetBrains Mono',monospace;font-size:12.5px;line-height:1.6">${escHtml(q.answer)}</pre>
+        ${q.explanation ? `<div style="margin-top:10px;font-size:13px;color:var(--text2)">📝 ${q.explanation}</div>` : ''}
+      </div>
+    `;
+    container.appendChild(card);
+  });
+}
+
+function checkPractice(i) {
+  const q = PRACTICE_QUESTIONS[i];
+  const userAns = document.getElementById(`pq-${i}`).value.trim();
+  const fb = document.getElementById(`pf-${i}`);
+  fb.style.display = 'block';
+
+  // Simplified check
+  const correct_trimmed = q.answer.trim().toLowerCase().replace(/\s+/g,' ');
+  const user_trimmed = userAns.toLowerCase().replace(/\s+/g,' ');
+
+  const isClose = user_trimmed.length > 5 && (
+    correct_trimmed.includes(user_trimmed.substring(0,20)) ||
+    user_trimmed.includes(correct_trimmed.substring(0,20))
+  );
+
+  if (isClose || userAns.toLowerCase() === q.answer.trim().toLowerCase()) {
+    fb.className = 'feedback-box feedback-correct';
+    fb.textContent = '✅ Correct! +20 XP';
+    addXP(20);
+    STATE.practiceCompleted++;
+    updateStreak();
+    checkBadges();
+    saveState();
+  } else {
+    fb.className = 'feedback-box feedback-wrong';
+    fb.textContent = '❌ Not quite. Check the hint or reveal the answer.';
+  }
+}
+
+function showPracticeHint(i) {
+  const el = document.getElementById(`ph-${i}`);
+  el.style.display = el.style.display === 'block' ? 'none' : 'block';
+}
+
+function revealPractice(i) {
+  document.getElementById(`pa-${i}`).style.display = 'block';
+}
+
+// ════════════════════════════════════════════════════
+// DAILY CHALLENGE
+// ════════════════════════════════════════════════════
+
+function getDailyChallenge() {
+  const d = new Date();
+  const idx = (d.getFullYear() * 1000 + d.getMonth() * 30 + d.getDate()) % DAILY_CHALLENGES.length;
+  return DAILY_CHALLENGES[idx];
+}
+
+function renderDaily() {
+  const t = today();
+  const dc = getDailyChallenge();
+  const isDone = STATE.dailyCompletedDates.includes(t);
+
+  document.getElementById('daily-date-label').textContent = new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+
+  document.getElementById('daily-content').innerHTML = `
+    <div class="daily-card" style="margin-bottom:24px">
+      <div style="font-size:11px;opacity:0.8;margin-bottom:6px;font-weight:600;letter-spacing:0.08em">TODAY'S CHALLENGE</div>
+      <div style="font-size:24px;font-weight:700;margin-bottom:8px">${dc.title}</div>
+      <div style="font-size:14px;opacity:0.85;margin-bottom:20px">${dc.desc}</div>
+      ${isDone
+        ? '<div style="background:rgba(255,255,255,0.2);border-radius:10px;padding:12px 16px;font-weight:600">✅ Completed today! You earned +25 XP</div>'
+        : '<div style="background:rgba(255,255,255,0.15);border-radius:10px;padding:12px 16px;font-size:13px;opacity:0.9">Streak: 🔥 ' + STATE.streak + ' days · XP Reward: +25</div>'
+      }
+    </div>
+
+    ${!isDone ? `
+    <div class="card" style="margin-bottom:20px">
+      <div style="font-size:14px;font-weight:600;margin-bottom:12px">Write your Python solution:</div>
+      <textarea class="practice-input" id="daily-input" placeholder="# Write your Python code here..." rows="8"></textarea>
+      <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap">
+        <button class="btn btn-primary" onclick="completeDaily()">✓ Mark Complete (+25 XP)</button>
+        <button class="btn btn-secondary" onclick="toggleDailyHint()">💡 Hint</button>
+        <button class="btn btn-secondary" onclick="toggleDailyAnswer()">🔍 Show Answer</button>
+      </div>
+      <div class="hint-box" id="daily-hint" style="margin-top:12px">💡 ${dc.hint}</div>
+      <div class="answer-box" id="daily-answer" style="display:none">
+        <strong style="color:var(--green);font-size:12px">ANSWER:</strong>
+        <pre style="margin-top:8px;font-family:'JetBrains Mono',monospace;font-size:12.5px;line-height:1.6">${escHtml(dc.answer)}</pre>
+      </div>
+    </div>` : ''}
+
+    <div class="card">
+      <div style="font-size:13px;font-weight:600;margin-bottom:14px">Challenge History</div>
+      ${STATE.dailyCompletedDates.length === 0
+        ? '<div style="color:var(--text3);font-size:13px">No challenges completed yet.</div>'
+        : STATE.dailyCompletedDates.slice(-10).reverse().map(d =>
+            `<div style="padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;display:flex;align-items:center;gap:8px">
+              <span style="color:var(--green)">✅</span> ${d}
+            </div>`
+          ).join('')
+      }
+    </div>
+  `;
+}
+
+function completeDaily() {
+  const t = today();
+  if (!STATE.dailyCompletedDates.includes(t)) {
+    STATE.dailyCompletedDates.push(t);
+    addXP(25);
+    updateStreak();
+    checkBadges();
+    saveState();
+    toast('🎯 Daily Challenge Complete! +25 XP 🔥', 3000);
+    renderDaily();
+    renderDashboard();
+  }
+}
+
+function toggleDailyHint() {
+  const el = document.getElementById('daily-hint');
+  if (el) el.style.display = el.style.display === 'block' ? 'none' : 'block';
+}
+function toggleDailyAnswer() {
+  const el = document.getElementById('daily-answer');
+  if (el) el.style.display = el.style.display === 'block' ? 'none' : 'block';
+}
+
+// ════════════════════════════════════════════════════
+// ANALYTICS
+// ════════════════════════════════════════════════════
+
+function renderAnalytics() {
+  const done = STATE.completedLessons.length;
+  const total = LESSONS_DATA.length;
+  const pct = total > 0 ? Math.round((done/total)*100) : 0;
+
+  document.getElementById('analytics-content').innerHTML = `
+    <div class="card-grid grid-4" style="margin-bottom:20px">
+      <div class="stat-card">
+        <div class="stat-icon">📚</div>
+        <div class="stat-label">Lessons Completed</div>
+        <div class="stat-value">${done}</div>
+        <div class="progress-wrap" style="margin-top:8px"><div class="progress-fill" style="width:${pct}%"></div></div>
+        <div class="stat-sub">${pct}% of course</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">⚡</div>
+        <div class="stat-label">Total XP</div>
+        <div class="stat-value">${STATE.xp}</div>
+        <div class="stat-sub">Level ${STATE.level} — ${LEVEL_NAMES[Math.min(STATE.level-1, LEVEL_NAMES.length-1)]}</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🔥</div>
+        <div class="stat-label">Current Streak</div>
+        <div class="stat-value">${STATE.streak}</div>
+        <div class="stat-sub">days</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🎯</div>
+        <div class="stat-label">Daily Challenges</div>
+        <div class="stat-value">${STATE.dailyCompletedDates.length}</div>
+        <div class="stat-sub">completed</div>
+      </div>
+    </div>
+
+    <div class="card-grid grid-2" style="margin-bottom:20px">
+      <div class="card">
+        <div style="font-size:13px;font-weight:600;margin-bottom:16px">Progress by Topic</div>
+        ${renderTopicBars()}
+      </div>
+      <div class="card">
+        <div style="font-size:13px;font-weight:600;margin-bottom:16px">XP to Next Level</div>
+        <div style="font-size:13px;color:var(--text2);margin-bottom:8px">Level ${STATE.level} → Level ${STATE.level+1}</div>
+        <div class="progress-wrap" style="height:12px;margin-bottom:8px">
+          <div class="progress-fill" style="width:${(STATE.xp % 200)/200*100}%"></div>
+        </div>
+        <div style="font-size:12px;color:var(--text3)">${STATE.xp % 200} / 200 XP</div>
+        <div style="margin-top:20px;font-size:13px;font-weight:600;margin-bottom:10px">Practice Score</div>
+        <div style="font-size:28px;font-weight:700;color:var(--accent2)">${STATE.practiceCompleted}</div>
+        <div style="font-size:12px;color:var(--text3)">exercises completed</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div style="font-size:13px;font-weight:600;margin-bottom:14px">Completed Lessons</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px">
+        ${LESSONS_DATA.map(l => `
+          <span class="chip ${STATE.completedLessons.includes(l.id) ? 'chip-green' : ''}" style="background:${STATE.completedLessons.includes(l.id)?'var(--green-bg)':'var(--surface2)'};color:${STATE.completedLessons.includes(l.id)?'var(--green)':'var(--text3)'}">
+            ${STATE.completedLessons.includes(l.id)?'✓':''} ${l.id}. ${l.title}
+          </span>
+        `).join('')}
+      </div>
+    </div>
+  `;
+}
+
+function renderTopicBars() {
+  const topics = [
+    {name:'Basics (1-5)',ids:[1,2,3,4,5]},
+    {name:'Control Flow (6-12)',ids:[6,7,8,9,10,11,12]},
+    {name:'Functions & Data (13-17)',ids:[13,14,15,16,17]},
+    {name:'Advanced (18-20)',ids:[18,19,20]},
+  ];
+  return topics.map(t => {
+    const done = t.ids.filter(id => STATE.completedLessons.includes(id)).length;
+    const pct = Math.round((done/t.ids.length)*100);
+    return `
+      <div style="margin-bottom:14px">
+        <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px">
+          <span>${t.name}</span><span style="color:var(--text2)">${done}/${t.ids.length}</span>
+        </div>
+        <div class="progress-wrap"><div class="progress-fill" style="width:${pct}%"></div></div>
+      </div>
+    `;
+  }).join('');
+}
+
+// ════════════════════════════════════════════════════
+// BADGES
+// ════════════════════════════════════════════════════
+
+function renderBadges() {
+  const container = document.getElementById('badges-content');
+  container.innerHTML = '';
+  ACHIEVEMENTS.forEach(a => {
+    const unlocked = STATE.unlockedBadges.includes(a.id);
+    const div = document.createElement('div');
+    div.className = `badge-card ${unlocked ? 'unlocked' : 'locked'}`;
+    div.innerHTML = `
+      <div class="badge-icon">${a.icon}</div>
+      <div class="badge-name">${a.name}</div>
+      <div class="badge-desc">${a.desc}</div>
+      ${unlocked ? '<div style="margin-top:8px"><span class="chip chip-green">Unlocked ✓</span></div>' : ''}
+    `;
+    container.appendChild(div);
+  });
+}
+
+// ════════════════════════════════════════════════════
+// CHEAT SHEET
+// ════════════════════════════════════════════════════
+
+function renderCheatSheet() {
+  const rows = [
+    ['Variable','<code>int x = 5;</code>','<code>x = 5</code>','No type keyword, no semicolon'],
+    ['String','<code>std::string s = "hi";</code>','<code>s = "hi"</code>','Built-in type, no header needed'],
+    ['Print','<code>cout &lt;&lt; x &lt;&lt; endl;</code>','<code>print(x)</code>','Function, not stream operator'],
+    ['Formatted Print','<code>printf("%.2f", x);</code>','<code>print(f"{x:.2f}")</code>','f-strings are modern printf'],
+    ['Input','<code>cin >> x;</code>','<code>x = int(input())</code>','Always cast — input() returns str'],
+    ['If','<code>if (x &gt; 0) { }</code>','<code>if x > 0:</code>','No parens, no braces, colon required'],
+    ['Else If','<code>else if (x &gt; 0) { }</code>','<code>elif x > 0:</code>','elif not else if'],
+    ['For Loop','<code>for (int i=0; i&lt;n; i++)</code>','<code>for i in range(n):</code>','range(start, stop, step)'],
+    ['While','<code>while (x &lt; 10) { }</code>','<code>while x &lt; 10:</code>','No parens, colon required'],
+    ['And / Or / Not','<code>&& || !</code>','<code>and or not</code>','English words, not symbols'],
+    ['Array','<code>std::vector&lt;int&gt; v;</code>','<code>lst = []</code>','Dynamic, mixed types OK'],
+    ['Array Access','<code>v[0], v.back()</code>','<code>lst[0], lst[-1]</code>','Negative indexing!'],
+    ['Append','<code>v.push_back(x)</code>','<code>lst.append(x)</code>','Always append()'],
+    ['Size','<code>v.size()</code>','<code>len(lst)</code>','len() is universal'],
+    ['Slice','<code>substr / iterators</code>','<code>lst[1:4]</code>','lst[start:stop:step]'],
+    ['Map/Dict','<code>std::map&lt;K,V&gt;</code>','<code>d = {}</code>','Built-in, no header'],
+    ['Dict Access','<code>m.at("key")</code>','<code>d["key"] / d.get("key",def)</code>','Use .get() for safety'],
+    ['Function','<code>int add(int a, int b)</code>','<code>def add(a, b):</code>','No return type, no types'],
+    ['Lambda','<code>[](int x){ return x*2; }</code>','<code>lambda x: x*2</code>','Cleaner syntax'],
+    ['Class','<code>class C { ... };</code>','<code>class C:</code>','No semicolon after class'],
+    ['Constructor','<code>C(int x) : x(x) {}</code>','<code>def __init__(self, x):</code>','Always explicit self'],
+    ['Power','<code>pow(2, 8)</code>','<code>2 ** 8</code>','Built-in operator'],
+    ['Integer Division','<code>7 / 2 → 3</code>','<code>7 // 2 → 3</code>','Use // for int division'],
+    ['True Division','<code>7.0 / 2 → 3.5</code>','<code>7 / 2 → 3.5</code>','/ always gives float'],
+    ['Switch','<code>switch(x){case 1: break;}</code>','<code>match x:\n  case 1:</code>','No break needed!'],
+    ['Null','<code>nullptr / NULL</code>','<code>None</code>','Check with "is None"'],
+    ['Pointer','<code>int* ptr = &x;</code>','<code>(no pointers)</code>','All refs, GC manages memory'],
+    ['True Copy','<code>auto b = a;</code>','<code>b = a.copy()</code>','b = a is an alias for lists!'],
+    ['Import','<code>#include &lt;vector&gt;</code>','<code>import math</code>','No headers, just import'],
+    ['String Format','<code>printf("%d", x)</code>','<code>f"{x}"</code>','f-strings > printf'],
+  ];
+
+  document.getElementById('cheatsheet-content').innerHTML = `
+    <div class="card" style="overflow-x:auto">
+      <table class="cs-table">
+        <thead><tr><th>Concept</th><th>C++</th><th>Python</th><th>Note</th></tr></thead>
+        <tbody>${rows.map(r=>`<tr><td style="font-weight:600;white-space:nowrap">${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td style="color:var(--text2);font-size:12px">${r[3]}</td></tr>`).join('')}</tbody>
+      </table>
+    </div>
+  `;
+}
+
+// ════════════════════════════════════════════════════
+// SETTINGS
+// ════════════════════════════════════════════════════
+
+function renderSettings() {
+  const s = STATE.settings || {};
+  document.getElementById('settings-content').innerHTML = `
+    <div style="display:flex;flex-direction:column;gap:1px;margin-bottom:24px">
+      <div class="setting-row">
+        <div><div style="font-weight:500;font-size:14px">Theme</div><div style="font-size:12px;color:var(--text2)">Light or dark mode</div></div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-sm ${STATE.theme!=='dark'?'btn-primary':'btn-secondary'}" onclick="setTheme('light')">☀️ Light</button>
+          <button class="btn btn-sm ${STATE.theme==='dark'?'btn-primary':'btn-secondary'}" onclick="setTheme('dark')">🌙 Dark</button>
+        </div>
+      </div>
+      <div class="setting-row">
+        <div><div style="font-weight:500;font-size:14px">Animations</div><div style="font-size:12px;color:var(--text2)">Smooth transitions</div></div>
+        <div class="toggle ${s.animations!==false?'on':''}" onclick="toggleSetting('animations')"></div>
+      </div>
+      <div class="setting-row">
+        <div><div style="font-weight:500;font-size:14px">Sound Effects</div><div style="font-size:12px;color:var(--text2)">UI feedback sounds</div></div>
+        <div class="toggle ${s.sound!==false?'on':''}" onclick="toggleSetting('sound')"></div>
+      </div>
+      <div class="setting-row">
+        <div><div style="font-weight:500;font-size:14px">Daily Goal</div><div style="font-size:12px;color:var(--text2)">Lessons per day target</div></div>
+        <div style="display:flex;gap:6px">${[1,2,3,5].map(n=>`<button class="btn btn-sm ${(s.dailyGoal||2)===n?'btn-primary':'btn-secondary'}" onclick="setDailyGoal(${n})">${n}</button>`).join('')}</div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:16px">
+      <div style="font-weight:600;font-size:14px;margin-bottom:10px">Progress Snapshot</div>
+      <div style="font-size:13px;color:var(--text2);line-height:2">
+        <div>Streak: <strong style="color:var(--amber)">${STATE.streak} days 🔥</strong></div>
+        <div>XP: <strong style="color:var(--accent2)">${STATE.xp} · Level ${STATE.level}</strong></div>
+        <div>Lessons: <strong>${STATE.completedLessons.length} / ${LESSONS_DATA.length}</strong></div>
+        <div>Daily Challenges: <strong>${STATE.dailyCompletedDates.length}</strong></div>
+        <div>Badges: <strong>${STATE.unlockedBadges.length} / ${ACHIEVEMENTS.length}</strong></div>
+      </div>
+    </div>
+
+    <div style="background:var(--red-bg);border:1px solid rgba(220,38,38,0.2);border-radius:var(--r);padding:16px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+      <div>
+        <div style="font-weight:500;font-size:14px;color:var(--red)">Reset All Progress</div>
+        <div style="font-size:12px;color:var(--text2)">Permanently erases all stats, XP, streaks, and lessons.</div>
+      </div>
+      <button class="btn btn-danger btn-sm" onclick="resetProgress()">Reset Everything</button>
+    </div>
+  `;
+}
+
+function setTheme(t) {
+  STATE.theme = t;
+  document.body.className = t === 'dark' ? 'dark' : '';
+  saveState();
+  updateNav();
+  renderSettings();
+}
+
+function toggleSetting(key) {
+  if (!STATE.settings) STATE.settings = {};
+  STATE.settings[key] = STATE.settings[key] === false ? true : false;
+  saveState();
+  renderSettings();
+}
+
+function setDailyGoal(n) {
+  if (!STATE.settings) STATE.settings = {};
+  STATE.settings.dailyGoal = n;
+  saveState();
+  renderSettings();
+}
+
+function resetProgress() {
+  if (confirm('Are you sure? This will erase all your progress, XP, streaks, and lessons. This cannot be undone.')) {
+    localStorage.removeItem(STORAGE_KEY);
+    location.reload();
+  }
+}
+
+// ════════════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════════════
+
+loadState();
+if (STATE.theme === 'dark') document.body.classList.add('dark');
+updateNav();
+updateStreak();
+renderDashboard();
+</script>
+</body>
+</html>

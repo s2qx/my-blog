@@ -71,12 +71,17 @@ defaultContentLanguageInSubdir = true
         identifier = "nav-contact"
         url = "/contact/"
         weight = 9
-
+[[languages.en.menu.main]]
+  name = "Links"
+  identifier = "nav-typecoach"
+  url = "/en/typecoach/"
+  weight = 10
 [[languages.en.menu.main]]
   name = "TypeCoach"
   identifier = "nav-typecoach"
   url = "/en/typecoach/"
-  weight = 10
+  weight = 11
+
 
 [pagination]
   pagerSize = 5
@@ -96,6 +101,7 @@ defaultContentLanguageInSubdir = true
   sidebarShow = true
   sidebarWidgets = ["search", "categories", "social", "downloads"]
   ShowLangSwitch = false
+
 
 [params.social]
   github = "https://github.com/s2qx"
