@@ -108,7 +108,7 @@ Full Bridge Rectifier coaster that fits 90mm cup diameter
 
 ![fifine k688 cable organizer](/images/fifine_k688_cable_organizer3.png)
 
-*Shifter Knob for Logitech G923*
+*fifine k688 cable organizer*
 
 [You can check the design here.](https://www.thingiverse.com/thing:7345645)
 
