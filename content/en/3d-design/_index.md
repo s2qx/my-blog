@@ -15,6 +15,7 @@ You can find my new 3D design on [Thingiverse](https://www.thingiverse.com/erik2
 - [Action Camera (GoPro) battery case](#action-camera-gopro-battery-case)
 - [Shifter Knob for Logitech G923](#shifter-knob-for-logitech-g923)
 - [Cat Feeder ](#Cat_Feeder )
+- [fifine k688 cable organizer ](#fifine_k688_cable_organizer )
 
 ---
 
@@ -100,3 +101,15 @@ Full Bridge Rectifier coaster that fits 90mm cup diameter
 *Cat Feeder*
 
 [You can check the design here.](https://www.thingiverse.com/thing:7172071)
+
+---
+
+### fifine k688 cable organizer
+
+![fifine k688 cable organizer](/images/fifine_k688_cable_organizer3.png)
+
+*Shifter Knob for Logitech G923*
+
+[You can check the design here.](https://www.thingiverse.com/thing:7345645)
+
+---
