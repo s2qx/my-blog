@@ -4,11 +4,42 @@ draft: false
 description: "Step-by-step guide to configure the Smart IoT Electric Extension using ESP32, RemoteXY Cloud, Telegram alerts, and Alexa integration."
 ---
 
-# 🚧 Coming Soon
+<style>
+html {
+  scroll-behavior: smooth;
+}
+</style>
 
-## Smart IoT Electric Extension
+## Project Team
 
-The full setup guide for this project is currently being prepared and refined.
+<div style="text-align:center;margin-bottom:30px;">
+
+<img src="/images/smart-extension/team.JPEG"
+     style="width:100%;max-width:700px;border-radius:16px;border:3px solid var(--primary);" />
+
+<p style="margin-top:10px;color:var(--secondary);font-size:14px;line-height:1.6;">
+Saad AL Mubaireek<br>
+Mohammed Al Abdullah<br>
+Mshari Al Jari<br>
+Alwaleed Al Qahtani<br>
+Musaad Alharbi<br>
+Rayan Alhizam<br><br>
+<strong>Advisor:</strong> Dr. Mohammed Alshakhs
+</p>
+
+</div>
+
+## Acknowledgment
+
+I would like to express my sincere thanks to **Dr. Mohammed Alshakhs** for his guidance and continuous support throughout the project.  
+
+I also appreciate my teammates **Mohammed Al Abdullah, Mshari Al Jari, Alwaleed Al Qahtani, Musaad Alharbi, and Rayan Alhizam** who worked with me on this project.  
+
+Finally, I would like to thank **King Faisal University** and the **Electrical Engineering Department** for providing the environment and resources that made this work possible.
+
+---
+
+# Smart IoT Electric Extension
 
 This system is designed to provide a **smart, safe, and remotely controlled power extension** with features such as:
 
@@ -18,15 +49,89 @@ This system is designed to provide a **smart, safe, and remotely controlled powe
 - **Over-current protection** with Telegram alerts
 - **Over-temperature safety shutdown**
 
-📌 A complete step-by-step guide, including firmware setup and system integration, will be published soon.
+---
 
-Stay tuned.
+## 📄 Project Resources
+
+- 📘 [Download Full Report](https://drive.google.com/file/d/142BBXYnQJlg6T29cSHDW1GGPBv1nqIF9/view?usp=sharing)
+- 🎥 Watch Setup Guide Video :
+
+{{< youtube SNEaLa4JW10 >}}
+
+- 🎥 Watch assembly Video :
+
+{{< youtube 93klfbm3Hts >}}
 
 ---
 
-<!-- FULL DOCUMENTATION (HIDDEN FOR NOW)
+## 📊 System Overview
 
-⚠️ Important Safety Warning
+![Design Workflow](/images/smart-extension/Design_workflow.jpg)
+
+*Overall workflow of the system from power input to monitoring and control.*
+
+---
+
+# System Overview and Design
+
+## 🧠 System Architecture
+
+### Software Block Diagram
+
+![Software Block Diagram](/images/smart-extension/Software_Block_Diagram.jpg)
+
+---
+
+### Circuit Diagram
+
+![System Circuit Diagram](/images/smart-extension/System_circuit_diagram.jpg)
+
+---
+
+## ⚙️ System Operation
+
+Using the RemoteXY app you can:
+
+- Turn sockets ON/OFF  
+- Set current limits  
+- Monitor current and temperature  
+- Track energy usage  
+
+---
+
+## 🧩 Hardware Implementation
+
+### Full PCB Assembly
+
+![Full PCB](/images/smart-extension/FULL_PCB.jpg)
+
+---
+
+### Main PCB + Current Board
+
+![Main PCB](/images/smart-extension/Both_main_PCB_and_current.png)
+
+---
+
+## 📦 Enclosure Design
+
+![3D Design](/images/smart-extension/3D_Project_Design.png)
+
+---
+
+## 🛡️ Safety Features
+
+### Over-Temperature Protection
+
+Shuts down at **60°C**
+
+### Over-Current Protection
+
+Trips after **5 seconds overload**
+
+---
+
+## ⚠️ Important Safety Warning
 
 Before starting the setup process:
 
@@ -43,39 +148,35 @@ This prevents electric shock, hardware damage, and unsafe operation.
 
 ## Contents
 
-1. Install Arduino IDE and ESP32 Support
-2. Install Required Libraries
-3. Create RemoteXY Cloud Token
-4. Setup Telegram Alerts
-5. Setup Alexa Control (SinricPro)
-6. Upload Firmware to ESP32
-7. Connect the Device to WiFi
-8. Connect Using RemoteXY Mobile App
-9. System Operation and Safety
+1. [Install Arduino IDE and ESP32 Support](#install-arduino-ide-and-esp32-support)  
+2. [Install Required Libraries](#install-required-libraries)  
+3. [Create RemoteXY Cloud Token](#create-remotexy-cloud-token)  
+4. [Setup Telegram Alerts](#setup-telegram-alerts)  
+5. [Setup Alexa Control SinricPro](#setup-alexa-control-sinricpro)  
+6. [Upload Firmware to ESP32](#upload-firmware-to-esp32)  
+7. [Remote Interface](#remote-interface)  
+8. [Connect the Device to WiFi](#connect-the-device-to-wifi)  
+9. [Connect Using RemoteXY Mobile App](#connect-using-remotexy-mobile-app)  
+10. [Final Step](#final-step)  
+11. [License](#license)  
 
 ---
-
-(ALL YOUR ORIGINAL CONTENT HERE — UNCHANGED)
-
-
 
 ## Install Arduino IDE and ESP32 Support
 
 Download Arduino IDE:
 
-```
-https://www.arduino.cc/en/software
-```
+[https://www.arduino.cc/en/software](https://www.arduino.cc/en/software)
 
 Open Arduino IDE and go to:
 
-```
+```text
 File → Preferences
-```
+````
 
 Add this to **Additional Boards Manager URLs**:
 
-```
+```text
 https://espressif.github.io/arduino-esp32/package_esp32_index.json
 ```
 
@@ -83,19 +184,19 @@ Press **OK**.
 
 Open Boards Manager:
 
-```
+```text
 Tools → Board → Boards Manager
 ```
 
 Search and install:
 
-```
+```text
 ESP32 by Espressif Systems
 ```
 
 Select the board:
 
-```
+```text
 Tools → Board → ESP32 Arduino → ESP32 Dev Module
 ```
 
@@ -105,68 +206,26 @@ Tools → Board → ESP32 Arduino → ESP32 Dev Module
 
 Open Library Manager:
 
-```
+```text
 Sketch → Include Library → Manage Libraries
 ```
 
-Install the following libraries:
+Install:
 
-```
+```text
 RemoteXY
 SinricPro
 ```
-
-These libraries allow the system to communicate with **RemoteXY Cloud** and **Alexa**.
 
 ---
 
 ## Create RemoteXY Cloud Token
 
-Open:
+Go to:
 
-```
-https://remotexy.com
-```
+[https://remotexy.com](https://remotexy.com)
 
-Login and navigate to:
-
-```
-My tokens
-```
-
-Click:
-
-```
-Create new token
-```
-
-Fill in:
-
-Board Name
-
-```
-Smart IoT Electric Extension
-```
-
-Cloud Server
-
-```
-cloud.remotexy.com
-```
-
-RemoteXY will generate a token similar to:
-
-```
-0123456789abcdef0123456789abcdef
-```
-
-Open your Arduino firmware and replace:
-
-```cpp
-#define REMOTEXY_CLOUD_TOKEN "REMOTEXY_CLOUD_TOKEN"
-```
-
-with
+Create a token and replace it in the code:
 
 ```cpp
 #define REMOTEXY_CLOUD_TOKEN "YOUR_TOKEN_HERE"
@@ -176,61 +235,19 @@ with
 
 ## Setup Telegram Alerts
 
-Telegram will notify the user when **overcurrent protection trips a socket**.
+Create a bot using:
 
-## Create a Telegram Bot
-
-Search for:
-
-```
+```text
 @BotFather
 ```
 
-Start the bot:
+Then get your Chat ID:
 
-```
-/start
-```
-
-Create a new bot:
-
-```
-/newbot
-```
-
-You will receive a **Bot Token** similar to:
-
-```
-123456789:AAExampleBotToken
-```
-
----
-
-## Get Your Chat ID
-
-Send any message to your bot.
-
-Open this URL:
-
-```
+```text
 https://api.telegram.org/botBOT_TOKEN/getUpdates
 ```
 
-Replace **BOT_TOKEN** with your real bot token.
-
-Find this field:
-
-```
-"chat":{"id":123456789}
-```
-
-That number is your **Telegram Chat ID**.
-
----
-
-## Add Credentials to the Firmware
-
-Insert the credentials into your code:
+Insert your credentials into the firmware:
 
 ```cpp
 const char* TG_BOT_TOKEN = "YOUR_BOT_TOKEN";
@@ -239,206 +256,102 @@ const char* TG_CHAT_ID   = "YOUR_CHAT_ID";
 
 ---
 
-## Setup Alexa Control (SinricPro)
+## Setup Alexa Control SinricPro
 
-Create an account:
+Go to:
 
-```
-https://sinric.pro
-```
+[https://sinric.pro](https://sinric.pro)
 
-Create **four devices** of type:
-
-```
-Switch
-```
-
-Example names:
-
-```
-Socket 1
-Socket 2
-Socket 3
-Socket 4
-```
-
-Copy the following credentials:
-
-```
-APP KEY
-APP SECRET
-DEVICE IDs
-```
-
-Insert them into the firmware:
+Create four switch devices and insert the credentials:
 
 ```cpp
 #define SINRIC_APP_KEY    "YOUR_APP_KEY"
 #define SINRIC_APP_SECRET "YOUR_APP_SECRET"
-
-#define DEVICE_ID_1 "DEVICE_ID_1"
-#define DEVICE_ID_2 "DEVICE_ID_2"
-#define DEVICE_ID_3 "DEVICE_ID_3"
-#define DEVICE_ID_4 "DEVICE_ID_4"
-```
-
-Example Alexa command:
-
-```
-Alexa, turn on Socket 1
 ```
 
 ---
 
 ## Upload Firmware to ESP32
 
-Connect ESP32 using USB.
+Connect ESP32 via USB.
 
-Select the COM port:
+Select the port:
 
-```
+```text
 Tools → Port
 ```
 
-Example:
+Upload the code.
 
-```
-COM5
-```
+---
 
-Compile the code:
+## 📱 Remote Interface
 
-```
-Verify ✔
-```
+![RemoteXY Interface](/images/smart-extension/REMOTEXY.jpg)
 
-Upload firmware:
-
-```
-Upload →
-```
-
-If upload fails, **hold the BOOT button during upload**.
-
-Open Serial Monitor:
-
-```
-Tools → Serial Monitor
-```
-
-Set baud rate:
-
-```
-115200
-```
-
-Example output:
-
-```
-[ACS712] Calibrating offsets
-[STA] Connecting
-[SYS] Ready
-```
+*RemoteXY interface used to control sockets and monitor current, temperature, and energy.*
 
 ---
 
 ## Connect the Device to WiFi
 
-If WiFi credentials are not stored, the ESP32 creates an access point.
+Connect to the access point:
 
-Connect your phone to:
-
-```
+```text
 Smart IoT Electric ExtensionXXXX
 ```
 
-Open browser:
+Open:
 
-```
+```text
 http://setup.local
 ```
 
-Press:
-
-```
-Scan
-```
-
-Select your WiFi network.
-
-Enter password.
-
-Press:
-
-```
-Save & Connect
-```
-
-The device will reboot and connect to your router.
+Configure WiFi.
 
 ---
 
 ## Connect Using RemoteXY Mobile App
 
-Install the **RemoteXY** mobile application.
-
-Open the app and press:
-
-```
-Connect
-```
-
-Select:
-
-```
-Cloud Server
-```
-
-Enter your **Cloud Token**.
-
-Press:
-
-```
-Connect
-```
-
-You can now control the extension remotely.
-
----
-
-## System Operation and Safety
-
-Using the RemoteXY app you can:
-
-- Turn each outlet **ON / OFF**
-- Set current limits **(1A / 2A / 3A)**
-- Monitor **current consumption**
-- Monitor **temperature**
-- Monitor **energy usage (kWh)**
-
----
-
-## Safety Features
-
-### Over-Temperature Protection
-
-If temperature exceeds **60°C**, all sockets automatically turn **OFF**.
-
-### Over-Current Protection
-
-If current exceeds the selected limit for **5 seconds**, that socket turns **OFF** and a **Telegram alert** is sent.
+Use the Cloud Token to connect the device to the RemoteXY mobile application.
 
 ---
 
 # Final Step
 
-After completing configuration:
+1. Disconnect USB.
+2. Reinstall the ESP32.
+3. Plug the extension into 220V.
 
-1. Disconnect ESP32 from USB  
-2. Reinstall ESP32 on the extension board  
-3. Plug the extension into the **220V outlet**
+The system is now operational.
 
-The **Smart IoT Electric Extension** is now ready for operation.
+---
 
--->
+# License
+
+## Saad AL Mubaireek Custom Non-Commercial License v1.0
+
+Copyright (c) 2026 Saad AL Mubaireek
+
+Permission is granted to any person obtaining a copy of this project and associated files to use, study, modify, and build the project for personal, educational, and non-commercial purposes only.
+
+### You may:
+
+* use the code
+* study the code
+* modify the code
+* build your own personal version
+
+### You may NOT:
+
+* sell this project
+* sell modified versions of this project
+* use this project for commercial purposes
+* manufacture this project for sale
+* rebrand and sell this project as your own product
+
+Commercial rights are reserved exclusively by the original creator, Saad AL Mubaireek.
+
+This project is provided "as is", without warranty of any kind, express or implied, including but not limited to the warranties of merchantability, fitness for a particular purpose, and noninfringement. In no event shall the author be liable for any claim, damages, or other liability arising from, out of, or in connection with the project or the use of this project.
+
 ---
