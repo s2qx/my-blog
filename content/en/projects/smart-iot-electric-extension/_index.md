@@ -14,7 +14,7 @@ html {
 
 <div style="text-align:center;margin-bottom:30px;">
 
-<img src="/images/smart-extension/team.JPEG"
+<img src="/images/smart-extension/team.png"
      style="width:100%;max-width:700px;border-radius:16px;border:3px solid var(--primary);" />
 
 <p style="margin-top:10px;color:var(--secondary);font-size:14px;line-height:1.6;">
