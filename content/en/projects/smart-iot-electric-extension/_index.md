@@ -12,22 +12,76 @@ html {
 
 ## Project Team
 
-<div style="text-align:center;margin-bottom:30px;">
+<div style="display:flex;flex-direction:column;align-items:center;gap:50px;margin-bottom:30px;">
 
-<img src="/images/smart-extension/team.png"
-     style="width:100%;max-width:700px;border-radius:16px;border:3px solid var(--primary);" />
+<!-- Top Row -->
+<div style="display:flex;justify-content:center;align-items:flex-end;gap:50px;flex-wrap:wrap;">
 
-<p style="margin-top:10px;color:var(--secondary);font-size:14px;line-height:1.6;">
-Saad AL Mubaireek<br>
-Mohammed Al Abdullah<br>
-Mshari Al Jari<br>
-Alwaleed Al Qahtani<br>
-Musaad Alharbi<br>
-Rayan Alhizam<br><br>
+<!-- Mshari -->
+<div style="text-align:center;width:180px;">
+<img src="/images/smart-extension/team/msh.jpg"
+     style="width:160px;height:160px;object-fit:cover;border-radius:12px;border:3px solid var(--primary);" />
+<p style="margin-top:12px;line-height:1.2;">
+Mshari<br><small style="color:var(--secondary);">Al Jari</small>
+</p>
+</div>
+
+<!-- Saad (center bigger) -->
+<div style="text-align:center;width:220px;">
+<img src="/images/smart-extension/team/saad.jpg"
+     style="width:220px;height:220px;object-fit:cover;border-radius:14px;border:4px solid var(--primary);" />
+<p style="margin-top:12px;font-weight:600;font-size:20px;line-height:1.2;">
+Saad<br><span style="font-weight:500;color:var(--secondary);">AL Mubaireek</span>
+</p>
+</div>
+
+<!-- Musaad -->
+<div style="text-align:center;width:180px;">
+<img src="/images/smart-extension/team/mosaad.jpg"
+     style="width:160px;height:160px;object-fit:cover;border-radius:12px;border:3px solid var(--primary);" />
+<p style="margin-top:12px;line-height:1.2;">
+Musaad<br><small style="color:var(--secondary);">Alharbi</small>
+</p>
+</div>
+
+</div>
+
+<!-- Bottom Row -->
+<div style="display:flex;justify-content:center;align-items:flex-start;gap:50px;flex-wrap:wrap;">
+
+<div style="text-align:center;width:180px;">
+<img src="/images/smart-extension/team/alw.jpg"
+     style="width:160px;height:160px;object-fit:cover;border-radius:12px;border:3px solid var(--primary);" />
+<p style="margin-top:12px;line-height:1.2;">
+Alwaleed<br><small style="color:var(--secondary);">Al Qahtani</small>
+</p>
+</div>
+
+<div style="text-align:center;width:180px;">
+<img src="/images/smart-extension/team/rayan.jpg"
+     style="width:160px;height:160px;object-fit:cover;border-radius:12px;border:3px solid var(--primary);" />
+<p style="margin-top:12px;line-height:1.2;">
+Rayan<br><small style="color:var(--secondary);">Alhizam</small>
+</p>
+</div>
+
+<!-- Mohammed -->
+<div style="text-align:center;width:180px;">
+<img src="/images/smart-extension/team/moh.jpg"
+     style="width:160px;height:160px;object-fit:cover;border-radius:12px;border:3px solid var(--primary);" />
+<p style="margin-top:12px;line-height:1.2;">
+Mohammed<br><small style="color:var(--secondary);">Al Abdullah</small>
+</p>
+</div>
+
+</div>
+
+<p style="text-align:center;color:var(--secondary);font-size:14px;margin-top:10px;">
 <strong>Advisor:</strong> Dr. Mohammed Alshakhs
 </p>
 
 </div>
+
 
 ## Acknowledgment
 
