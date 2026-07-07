@@ -1,12 +1,14 @@
-+++
-title = "Electronics II – Obstacle-Navigating Robot"
-description = "A line-following robot with autonomous parking, using IR obstacle sensing and Op-Amp circuits for precise movement control."
-category = "Course Project"
-date = 2023-10-01
-images = []
-report_link = "https://drive.google.com/file/d/1pwtprDcIho4U6Yza-goB8tfvYo-wIfQr/view?usp=drive_link"
-draft = false
-+++
+---
+title: Electronics II – Obstacle-Navigating Robot
+description: A line-following robot with autonomous parking, using IR obstacle
+  sensing and Op-Amp circuits for precise movement control.
+category: Course Project
+date: 2023-10-01
+images:
+  - screenshot-2026-07-07-190929.png
+report_link: https://drive.google.com/file/d/1pwtprDcIho4U6Yza-goB8tfvYo-wIfQr/view?usp=drive_link
+draft: false
+---
 
 The field of robotics has made significant strides in recent years, with autonomous robots being applied in industrial automation, transportation, and safety systems.
 
