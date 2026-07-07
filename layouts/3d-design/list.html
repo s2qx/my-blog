@@ -1,0 +1,25 @@
+{{ define "main" }}
+<article class="post-single">
+  <header class="post-header">
+    <h1 class="post-title">{{ .Title }}</h1>
+    {{ with .Content }}<div class="post-content">{{ . }}</div>{{ end }}
+  </header>
+
+  {{ $pages := (where .Pages "Params.draft" "!=" true).ByDate.Reverse }}
+  <div class="ee-grid">
+    {{ range $pages }}
+    {{ $img := "" }}
+    {{ with .Params.images }}{{ if gt (len .) 0 }}{{ $img = index . 0 }}{{ end }}{{ end }}
+    <div class="ee-card" data-category="3d-print">
+      <div class="ee-card-band"></div>
+      {{ if $img }}<img class="ee-card-img" src="{{ $img }}" alt="{{ .Title }}" loading="lazy">{{ end }}
+      <div class="ee-card-body">
+        <h3><a href="{{ .RelPermalink }}">{{ .Title }}</a></h3>
+        <p>{{ with .Params.description }}{{ . }}{{ else }}{{ .Summary }}{{ end }}</p>
+        <a class="ee-card-link" href="{{ .RelPermalink }}">View design →</a>
+      </div>
+    </div>
+    {{ end }}
+  </div>
+</article>
+{{ end }}

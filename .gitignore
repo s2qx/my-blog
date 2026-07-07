@@ -1,7 +1,7 @@
-# Hugo build output
 /public/
 /resources/_gen/
 /hugo_cache/
 /node_modules/
 /.DS_Store
 *.log
+/.hugo_build.lock

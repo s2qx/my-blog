@@ -1,0 +1,10 @@
+# Old bilingual URLs -> new single-language URLs
+/en/*  /:splat  301
+/ar/*  /  301
+
+# The "Personal projects" page was folded into PCB & Hardware
+/personal-projects/*  /pcb-hardware/  301
+
+# Side-project web apps moved under /playground/
+/typecoach/*  /playground/typecoach/:splat  301
+/pybridge/*   /playground/pybridge/:splat   301

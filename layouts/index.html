@@ -1,0 +1,45 @@
+{{ define "main" }}
+<section class="ee-hero">
+  <span class="ee-eyebrow">Electrical Engineering &middot; PCB &middot; Arduino &middot; 3D Design</span>
+  <h1>{{ with .Params.heading }}{{ . }}{{ else }}{{ .Site.Params.heroTitle }}{{ end }}</h1>
+  <p>{{ with .Params.intro }}{{ . }}{{ else }}{{ .Site.Params.heroSubTitle }}{{ end }}</p>
+  {{ with .Params.image }}<img src="{{ . }}" alt="{{ $.Title }}">{{ end }}
+</section>
+
+<div class="ee-grid">
+  <a class="ee-card" href="/projects/" style="text-decoration:none">
+    <div class="ee-card-band" style="background:linear-gradient(90deg,#8d6e4b 0 33%,#1c1a18 33% 66%,var(--band-orange) 66% 100%)"></div>
+    <div class="ee-card-body">
+      <span class="ee-card-tag">Portfolio</span>
+      <h3>Projects</h3>
+      <p>Course projects, competitions, and personal builds — relays, robots, WPT, comms, power systems, and more.</p>
+    </div>
+  </a>
+  <a class="ee-card" href="/pcb-hardware/" style="text-decoration:none">
+    <div class="ee-card-band" style="background:linear-gradient(90deg,var(--band-brown) 0 25%,var(--band-black) 25% 50%,var(--band-orange) 50% 75%,var(--band-gold) 75% 100%)"></div>
+    <div class="ee-card-body">
+      <span class="ee-card-tag">Builds</span>
+      <h3>PCB &amp; Hardware</h3>
+      <p>Small circuits and boards: FM transmitters, MOSFET switches, servo drivers, ESP32 controllers.</p>
+    </div>
+  </a>
+  <a class="ee-card" href="/tutorials/" style="text-decoration:none">
+    <div class="ee-card-band" style="background:linear-gradient(90deg,#1565c0 0 33%,#1565c0 33% 66%,var(--band-orange) 66% 100%)"></div>
+    <div class="ee-card-body">
+      <span class="ee-card-tag">Guides</span>
+      <h3>Tutorials</h3>
+      <p>Step-by-step guides for the tools I use — FlatCam, G-code, and CNC workflows.</p>
+    </div>
+  </a>
+  <a class="ee-card" href="/3d-design/" style="text-decoration:none">
+    <div class="ee-card-band" style="background:linear-gradient(90deg,var(--band-gold) 0 33%,#5f5650 33% 66%,var(--band-orange) 66% 100%)"></div>
+    <div class="ee-card-body">
+      <span class="ee-card-tag">Prints</span>
+      <h3>3D Design</h3>
+      <p>Printable enclosures, stands, and knobs designed to solve small everyday problems.</p>
+    </div>
+  </a>
+</div>
+
+{{ with .Content }}<div class="post-content">{{ . }}</div>{{ end }}
+{{ end }}

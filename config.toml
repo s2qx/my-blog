@@ -1,93 +1,16 @@
-baseURL = "https://blog.almubaireek.com/"
+baseURL = "https://almubaireek.com/"
 title = "Saad ALMubaireek – EE Projects & Experiments"
 theme = "PaperMod"
+languageCode = "en-us"
 
+# ── Single language (Arabic removed) ─────────────────────────────
 defaultContentLanguage = "en"
-defaultContentLanguageInSubdir = true
-
-[languages]
-
-  [languages.en]
-    languageName = "English"
-    weight = 1
-    contentDir = "content/en"
-
-    [languages.en.params]
-      heroTitle = "Exploring Electrical Engineering, One Quirky Project at a Time"
-      heroSubTitle = "PCB design, 3D enclosures, and microcontroller boards"
-
-    [languages.en.menu]
-
-      [[languages.en.menu.main]]
-        name = "Home"
-        identifier = "nav-home"
-        url = "/"
-        weight = 1
-
-      [[languages.en.menu.main]]
-        name = "Projects"
-        identifier = "nav-projects"
-        url = "/projects/"
-        weight = 2
-
-      [[languages.en.menu.main]]
-        name = "Personal projects"
-        identifier = "nav-personal-projects"
-        url = "/personal-projects/"
-        weight = 3
-
-      [[languages.en.menu.main]]
-        name = "Eco-Drive"
-        identifier = "nav-eco-drive"
-        url = "/projects/eco-drive/"
-        weight = 4
-
-      [[languages.en.menu.main]]
-        name = "Smart IoT Electric Extension"
-        identifier = "nav-smart-iot-electric-extension"
-        url = "/projects/smart-iot-electric-extension/"
-        weight = 5
-
-      [[languages.en.menu.main]]
-        name = "Tutorials"
-        identifier = "nav-tutorials"
-        url = "/tutorials/"
-        weight = 6
-
-      [[languages.en.menu.main]]
-        name = "3D Design"
-        identifier = "nav-3d-design"
-        url = "/3d-design/"
-        weight = 7
-
-      [[languages.en.menu.main]]
-        name = "About"
-        identifier = "nav-about"
-        url = "/about/"
-        weight = 8
-
-      [[languages.en.menu.main]]
-        name = "Contact"
-        identifier = "nav-contact"
-        url = "/contact/"
-        weight = 9
-[[languages.en.menu.main]]
-  name = "Links"
-  identifier = "nav-typecoach"
-  url = "/en/typecoach/"
-  weight = 10
-[[languages.en.menu.main]]
-  name = "TypeCoach"
-  identifier = "nav-typecoach"
-  url = "/en/typecoach/"
-  weight = 11
-
-
-[pagination]
-  pagerSize = 5
+defaultContentLanguageInSubdir = false
 
 [params]
-  defaultTheme = "auto"
+  heroTitle = "Exploring Electrical Engineering, One Quirky Project at a Time"
+  heroSubTitle = "PCB design, 3D enclosures, and microcontroller boards"
+  defaultTheme = "auto"        # respects OS light/dark, toggle button still works
   showSocial = true
   showSocialEmpty = false
   ShowReadingTime = false
@@ -96,20 +19,71 @@ defaultContentLanguageInSubdir = true
   ShareButtons = ["linkedin", "whatsapp", "email"]
   ShowPostNavLinks = true
   ShowCodeCopyButtons = true
+  ShowFullTextinRSS = true
+  ShowRssButtonInSectionTermList = false
+  ShowWordCount = false
+  ShowLangSwitch = false
   heroEnable = true
   heroImage = "/images/hero-banner.jpg"
-  sidebarShow = true
-  sidebarWidgets = ["search", "categories", "social", "downloads"]
-  ShowLangSwitch = false
 
+  [params.social]
+    github = "https://github.com/s2qx"
+    linkedin = "https://www.linkedin.com/in/saad-khaild-almubaireek"
+    whatsapp = "https://wa.me/547252287"
+    email = "mailto:saad@almubaireek.com"
 
-[params.social]
-  github = "https://github.com/s2qx"
-  linkedin = "https://www.linkedin.com/in/saad-khaild-almubaireek"
-  whatsapp = "https://wa.me/547252287"
-  email = "mailto:saad@almubaireek.com"
+[menu]
+  [[menu.main]]
+    name = "Home"
+    identifier = "nav-home"
+    url = "/"
+    weight = 1
+  [[menu.main]]
+    name = "Projects"
+    identifier = "nav-projects"
+    url = "/projects/"
+    weight = 2
+  [[menu.main]]
+    name = "PCB & Hardware"
+    identifier = "nav-pcb-hardware"
+    url = "/pcb-hardware/"
+    weight = 3
+  [[menu.main]]
+    name = "Tutorials"
+    identifier = "nav-tutorials"
+    url = "/tutorials/"
+    weight = 4
+  [[menu.main]]
+    name = "3D Design"
+    identifier = "nav-3d-design"
+    url = "/3d-design/"
+    weight = 5
+  [[menu.main]]
+    name = "Playground"
+    identifier = "nav-playground"
+    url = "/playground/"
+    weight = 6
+  [[menu.main]]
+    name = "About"
+    identifier = "nav-about"
+    url = "/about/"
+    weight = 7
+  [[menu.main]]
+    name = "Contact"
+    identifier = "nav-contact"
+    url = "/contact/"
+    weight = 8
+
+[pagination]
+  pagerSize = 9
 
 [markup]
   [markup.goldmark]
     [markup.goldmark.renderer]
       unsafe = true
+  [markup.tableOfContents]
+    startLevel = 2
+    endLevel = 4
+
+[outputs]
+  home = ["HTML", "RSS"]

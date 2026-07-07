@@ -1,0 +1,24 @@
+{{ define "main" }}
+<article class="post-single">
+  <header class="post-header">
+    <h1 class="post-title">{{ .Title }}</h1>
+    {{ with .Params.intro }}<p class="post-description">{{ . }}</p>{{ end }}
+  </header>
+
+  {{ range .Params.items }}
+  {{ $item := . }}
+  <div class="ee-build">
+    <h3>{{ $item.name }}</h3>
+    {{ with $item.description }}<p>{{ . }}</p>{{ end }}
+    {{ with $item.images }}
+    <div class="ee-gallery">
+      {{ range . }}<img src="{{ . }}" alt="{{ $item.name }}" loading="lazy">{{ end }}
+    </div>
+    {{ end }}
+    {{ with $item.link }}<a class="ee-cta" href="{{ . }}">See the full project →</a>{{ end }}
+  </div>
+  {{ end }}
+
+  {{ with .Content }}<div class="post-content">{{ . }}</div>{{ end }}
+</article>
+{{ end }}

@@ -1,0 +1,20 @@
+{{ define "main" }}
+<article class="post-single" style="max-width:620px;margin:0 auto">
+  <header class="post-header" style="text-align:center">
+    <h1 class="post-title">{{ with .Params.full_name }}{{ . }}{{ else }}{{ .Title }}{{ end }}</h1>
+    {{ with .Params.tagline }}<p class="post-description">{{ . }}</p>{{ end }}
+  </header>
+
+  {{ range .Params.links }}
+  <a class="ee-contact-card" href="{{ .url }}" target="_blank" rel="noopener">
+    <div>
+      <div class="label">{{ .label }}</div>
+      {{ with .description }}<div class="desc">{{ . }}</div>{{ end }}
+    </div>
+    <div class="arrow">↗</div>
+  </a>
+  {{ end }}
+
+  {{ with .Content }}<div class="post-content">{{ . }}</div>{{ end }}
+</article>
+{{ end }}

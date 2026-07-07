@@ -1,0 +1,59 @@
+{{ define "main" }}
+<article class="post-single">
+  <header class="post-header">
+    <h1 class="post-title">{{ .Title }}</h1>
+    {{ with .Content }}<div class="post-content">{{ . }}</div>{{ end }}
+  </header>
+
+  {{ $pages := where .Pages "Params.draft" "!=" true }}
+  {{ $pages = $pages.ByDate.Reverse }}
+  {{ $cats := slice }}
+  {{ range $pages }}{{ with .Params.category }}{{ $cats = $cats | append . }}{{ end }}{{ end }}
+  {{ $cats = $cats | uniq | sort }}
+
+  {{ if gt (len $cats) 1 }}
+  <div class="ee-filters" id="ee-filters">
+    <a href="#" class="ee-filter active" data-filter="all">All</a>
+    {{ range $cats }}
+    <a href="#" class="ee-filter" data-filter="{{ . | urlize }}">{{ . }}</a>
+    {{ end }}
+  </div>
+  {{ end }}
+
+  <div class="ee-grid" id="ee-project-grid">
+    {{ range $pages }}
+    {{ $img := "" }}
+    {{ with .Params.images }}{{ if gt (len .) 0 }}{{ $img = index . 0 }}{{ end }}{{ end }}
+    <div class="ee-card" data-category="{{ .Params.category | default "course-project" | urlize }}">
+      <div class="ee-card-band"></div>
+      {{ if $img }}<img class="ee-card-img" src="{{ $img }}" alt="{{ .Title }}" loading="lazy">{{ end }}
+      <div class="ee-card-body">
+        {{ with .Params.category }}<span class="ee-card-tag">{{ . }}</span>{{ end }}
+        <h3><a href="{{ .RelPermalink }}">{{ .Title }}</a></h3>
+        <p>{{ with .Params.description }}{{ . }}{{ else }}{{ .Summary }}{{ end }}</p>
+        {{ with .Date }}<div class="ee-card-meta">{{ .Format "January 2006" }}</div>{{ end }}
+        <a class="ee-card-link" href="{{ .RelPermalink }}">View project →</a>
+      </div>
+    </div>
+    {{ end }}
+  </div>
+</article>
+
+<script>
+(function(){
+  var buttons = document.querySelectorAll('#ee-filters .ee-filter');
+  var cards = document.querySelectorAll('#ee-project-grid .ee-card');
+  buttons.forEach(function(btn){
+    btn.addEventListener('click', function(e){
+      e.preventDefault();
+      buttons.forEach(function(b){ b.classList.remove('active'); });
+      btn.classList.add('active');
+      var filter = btn.getAttribute('data-filter');
+      cards.forEach(function(card){
+        card.style.display = (filter === 'all' || card.getAttribute('data-category') === filter) ? '' : 'none';
+      });
+    });
+  });
+})();
+</script>
+{{ end }}
